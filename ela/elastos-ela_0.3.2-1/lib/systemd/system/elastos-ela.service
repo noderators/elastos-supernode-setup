@@ -1,0 +1,19 @@
+[Unit]
+Description=Elastos Mainchain Node Daemon
+After=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/data/elastos-ela
+EnvironmentFile=/etc/elastos-ela/params.env
+ExecStart=/usr/local/bin/elastos-ela-run.sh \
+            -f ${CONFIG_FILE}               \
+            -p ${KEYSTORE_PASSWORD}         \
+            -c start 
+
+User=elauser
+Group=elauser
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
