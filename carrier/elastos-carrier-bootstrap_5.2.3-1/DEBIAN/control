@@ -1,0 +1,12 @@
+Package: elastos-carrier-bootstrap
+Source: noderators
+Version: 5.2.3-1
+Architecture: amd64
+Maintainer: Kiran Pachhai <kiran.pachhai@gmail.com>
+Pre-Depends: adduser
+Depends: lsb-base (>= 3.0), init-system-helpers (>= 1.18~), libc6 (>= 2.14), libsystemd0
+Homepage: http://www.elastos.org/
+Description: Elastos Carrier Bootstrap (daemon)
+ Elastos Carrier is a decentralized peer to peer communication framework.
+ This package contains the elastos carrier bootstrap daemon.
+ Use this bootstrap connect to other peer nodes in the network. 

@@ -15,7 +15,7 @@ done
 
 if [ -z "${CONFIG_FILE}" ]
 then
-  CONFIG_FILE="/etc/elastos-ela/config.json"
+  CONFIG_FILE="/data/elastos/ela/config.json"
 fi
 
 if [ "${COMMAND}" == "start" ]

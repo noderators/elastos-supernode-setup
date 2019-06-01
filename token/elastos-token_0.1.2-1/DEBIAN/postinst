@@ -1,0 +1,12 @@
+#!/bin/sh
+
+adduser --system \
+        --quiet \
+        --group \
+        --no-create-home \
+        --disabled-password \
+        --home /data/elastos \
+        elauser
+
+mkdir -p /data/elastos/token 
+chown -R elauser:elauser /data/elastos
