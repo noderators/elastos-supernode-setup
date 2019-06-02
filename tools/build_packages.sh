@@ -39,15 +39,16 @@ build_deb_package carrier elastos-carrier-bootstrap_5.2.3-1 elastos-carrier-boot
 
 cd $CURR_DIR
 
+## SOME USEFUL COMMANDS
 # Install deb package
 # sudo dpkg -i package.deb
 # Start the service
-# sudo systemctl start elastos-ela
+# sudo systemctl start package-name
 # Start on boot
-# sudo systemctl enable elastos-ela
+# sudo systemctl enable package-name
 # Stop the service
-# sudo systemctl stop elastos-ela
+# sudo systemctl stop package-name
 # Check the status of the service
-# sudo systemctl status elastos-ela
+# sudo systemctl status package-name
 # Remove deb package
 # sudo apt-get remove package-name
