@@ -8,9 +8,16 @@ function build_deb_package() {
 
     cd $WORK_DIR
     dpkg-deb --build $PACKAGE
+    cd $CURR_DIR
 }
 
 build_deb_package ela elastos-ela_0.3.2-1
+
+build_deb_package did elastos-did_0.1.2-1
+
+build_deb_package token elastos-token_0.1.2-1
+
+build_deb_package carrier elastos-carrier-bootstrap_5.2.3-1
 
 cd $CURR_DIR
 
