@@ -11,5 +11,5 @@ done
 
 if [ "${COMMAND}" == "start" ]
 then
-    nohup /usr/local/bin/elastos-did > /dev/null 2>output
+    /usr/local/bin/elastos-did
 fi

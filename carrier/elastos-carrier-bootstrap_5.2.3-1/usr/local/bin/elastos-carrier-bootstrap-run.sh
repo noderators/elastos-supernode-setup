@@ -18,5 +18,5 @@ fi
 
 if [ "${COMMAND}" == "start" ]
 then
-  nohup /usr/local/bin/elastos-carrier-bootstrap --config ${CONFIG_FILE} --foreground > /dev/null 2>output
+  /usr/local/bin/elastos-carrier-bootstrap --config ${CONFIG_FILE} --foreground
 fi

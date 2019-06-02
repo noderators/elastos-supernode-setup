@@ -8,5 +8,5 @@ adduser --system \
         --home /data/elastos \
         elauser
 
-mkdir -p /data/elastos/carrier 
+mkdir -p /data/elastos/carrier/db
 chown -R elauser:elauser /data/elastos

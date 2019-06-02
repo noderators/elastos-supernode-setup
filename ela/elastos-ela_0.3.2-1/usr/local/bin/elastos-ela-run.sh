@@ -22,8 +22,8 @@ if [ "${COMMAND}" == "start" ]
 then
   if [ -z "${KEYSTORE_PASSWORD}" ]
   then
-    nohup /usr/local/bin/elastos-ela --conf ${CONFIG_FILE} > /dev/null 2>output
+    /usr/local/bin/elastos-ela --conf ${CONFIG_FILE}
   else 
-    echo ${KEYSTORE_PASSWORD} | nohup /usr/local/bin/elastos-ela --conf ${CONFIG_FILE} > /dev/null 2>output
+    echo ${KEYSTORE_PASSWORD} | /usr/local/bin/elastos-ela --conf ${CONFIG_FILE}
   fi
 fi
