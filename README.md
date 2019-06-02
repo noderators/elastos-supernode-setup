@@ -50,8 +50,26 @@
 5. Update /data/elastos/carrier/bootstrap.conf
     - Change "external_ip" to your own public IP address. Make sure to remove the 2 backslashes "//" from the line too
 
-## Noderators - Jazz
+## Upgrade instructions
+1. Remove the previous package-name 
+    ```
+    sudo apt-get remove elastos-ela elastos-did elastos-token elastos-carrier-boostrap
+    ```
+2. Install the latest package
+    ```
+    sudo dpkg -i package-name.deb
+    ```
 
+## Roadmap for this repository
+- Update the deb packages with metrics service so the daemons start producing meaningful metrics that can be used to watch over your supernodes 
+- Update the deb packages so if the node goes down, it alerts via SMS or email
+
+## Noderators - Jazz
+- IP Address: 18.191.96.97
+- Elastos Mainchain Node: 18.191.96.97:20338
+- Elastos DID Sidechain Node: 18.191.96.97:20608
+- Elastos Token Sidechain Node: 18.191.96.97:20618
+- Elastos Carrier Bootstrap Node: 18.191.96.97:33445
 
 ## Noderators - Champagne
 
