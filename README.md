@@ -1,7 +1,11 @@
 ## Pre-requisites
 - Ubuntu Server 18.04 LTS
 
-## How to install everything
+## How to download the .deb packages(the easy way)
+
+- Go to [https://github.com/noderators/elastos-supernode-setup/releases](https://github.com/noderators/elastos-supernode-setup/releases) and download the latest releases
+
+## How to build and install everything yourself(the hard way)
 1. Build the .deb packages on your ubuntu machine
     ```
     tools/build_packages.sh
@@ -9,22 +13,22 @@
 
 2. Install elastos-ela
     ```
-    sudo dpkg -i ela/*.deb
+    sudo dpkg -i ela/elastos-ela_0.3.2-1.deb
     ```
 
 3. Install elastos-did
     ```
-    sudo dpkg -i did/*.deb
+    sudo dpkg -i did/elastos-did_0.1.2-1.deb
     ```
 
 4. Install elastos-token
     ```
-    sudo dpkg -i token/*.deb
+    sudo dpkg -i token/elastos-token_0.1.2-1.deb
     ```
 
 5. Install elastos-carrier-boostrap
     ```
-    sudo dpkg -i carrier/*.deb
+    sudo dpkg -i carrier/elastos-carrier-bootstrap_5.2.3-1.deb
     ```
 
 ## Change configs
@@ -49,15 +53,36 @@
     - Change "RPCPass" to your own username you want to set
 5. Update /data/elastos/carrier/bootstrap.conf
     - Change "external_ip" to your own public IP address. Make sure to remove the 2 backslashes "//" from the line too
+6. Once all the changes are in place, enable your services to start on boot
+    ```
+    sudo systemctl enable elastos-ela elastos-did elastos-token elastos-carrier-bootstrap
+    ```
+7. Now, start up your services
+    ```
+    sudo systemctl start elastos-ela elastos-did elastos-token elastos-carrier-bootstrap
+    ```
 
 ## Upgrade instructions
-1. Remove the previous package-name 
+Whenever there is a new package available, you need to upgrade your package on your machine to receive the latest apps so follow the instructions then:
+
+1. Download the new releases by going to [https://github.com/noderators/elastos-supernode-setup/releases](https://github.com/noderators/elastos-supernode-setup/releases)
+
+2. Stop the services
+    ```
+    sudo systemctl stop elastos-ela elastos-did elastos-token elastos-carrier-bootstrap
+    ```
+3. Remove the previous package-name 
     ```
     sudo apt-get remove elastos-ela elastos-did elastos-token elastos-carrier-boostrap
     ```
-2. Install the latest package
+4. Install the latest package
     ```
     sudo dpkg -i package-name.deb
+    ```
+5. Restart the services
+    ```
+    sudo systemctl daemon-reload
+    sudo systemctl start elastos-ela elastos-did elastos-token elastos-carrier-bootstrap
     ```
 
 ## Roadmap for this repository
