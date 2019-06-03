@@ -99,3 +99,8 @@ Whenever there is a new package available, you need to upgrade your package on y
 - Elastos Carrier Bootstrap Node: 52.59.63.202:33445
 
 ## Noderators - Watermelon(Asia - Mumbai)
+- IP Address: 13.126.159.176
+- Elastos Mainchain Node: 13.126.159.176:20338
+- Elastos DID Sidechain Node: 13.126.159.176:20608
+- Elastos Token Sidechain Node: 13.126.159.176:20618
+- Elastos Carrier Bootstrap Node: 13.126.159.176:33445
