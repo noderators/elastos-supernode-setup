@@ -67,22 +67,15 @@ Whenever there is a new package available, you need to upgrade your package on y
 
 1. Download the new releases by going to [https://github.com/noderators/elastos-supernode-setup/releases](https://github.com/noderators/elastos-supernode-setup/releases)
 
-2. Stop the services
-    ```
-    sudo systemctl stop elastos-ela elastos-did elastos-token elastos-carrier-bootstrap
-    ```
-3. Remove the previous package-name 
-    ```
-    sudo apt-get remove elastos-ela elastos-did elastos-token elastos-carrier-boostrap
-    ```
-4. Install the latest package
+2. Install the latest package
     ```
     sudo dpkg -i package-name.deb
     ```
+
 5. Restart the services
     ```
     sudo systemctl daemon-reload
-    sudo systemctl start elastos-ela elastos-did elastos-token elastos-carrier-bootstrap
+    sudo systemctl restart elastos-ela elastos-did elastos-token elastos-carrier-bootstrap
     ```
 
 ## Roadmap for this repository
