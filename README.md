@@ -72,7 +72,9 @@ Whenever there is a new package available, you need to upgrade your package on y
     sudo dpkg -i package-name.deb
     ```
 
-5. Restart the services
+3. Go back to "Change configs" section above to re-modify all the config files that might have been updated
+
+4. Restart the services
     ```
     sudo systemctl daemon-reload
     sudo systemctl restart elastos-ela elastos-did elastos-token elastos-carrier-bootstrap
