@@ -97,6 +97,10 @@ Whenever there is a new package available, you need to upgrade your package on y
 - Elastos Carrier Bootstrap Node: 18.191.96.97:33445
 
 ## Noderators - Champagne(Europe - Frankfurt)
-
+- IP Address: 52.59.63.202
+- Elastos Mainchain Node: 52.59.63.202:20338
+- Elastos DID Sidechain Node: 52.59.63.202:20608
+- Elastos Token Sidechain Node: 52.59.63.202:20618
+- Elastos Carrier Bootstrap Node: 52.59.63.202:33445
 
 ## Noderators - Watermelon(Asia - Tokyo)
