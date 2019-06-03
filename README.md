@@ -89,14 +89,14 @@ Whenever there is a new package available, you need to upgrade your package on y
 - Update the deb packages with metrics service so the daemons start producing meaningful metrics that can be used to watch over your supernodes 
 - Update the deb packages so if the node goes down, it alerts via SMS or email
 
-## Noderators - Jazz
+## Noderators - Jazz(US - Ohio)
 - IP Address: 18.191.96.97
 - Elastos Mainchain Node: 18.191.96.97:20338
 - Elastos DID Sidechain Node: 18.191.96.97:20608
 - Elastos Token Sidechain Node: 18.191.96.97:20618
 - Elastos Carrier Bootstrap Node: 18.191.96.97:33445
 
-## Noderators - Champagne
+## Noderators - Champagne(Europe - Frankfurt)
 
 
-## Noderators - Watermelon
+## Noderators - Watermelon(Asia - Tokyo)
