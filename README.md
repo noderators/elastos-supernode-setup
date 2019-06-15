@@ -64,25 +64,9 @@
     ```
 
 ## Upgrade instructions
-Whenever there is a new package available, you need to upgrade your package on your machine to receive the latest apps so follow the instructions then:
-
-1. Download the new releases by going to [https://github.com/noderators/elastos-supernode-setup/releases](https://github.com/noderators/elastos-supernode-setup/releases)
-
-2. Install the latest package
-    ```
-    sudo dpkg -i package-name.deb
-    ```
-
-3. Go back to "Change configs" section above to re-modify all the config files that might have been updated
-
-4. Restart the services
-    ```
-    sudo systemctl daemon-reload
-    sudo systemctl restart elastos-ela elastos-did elastos-token elastos-carrier-bootstrap
-    ```
+Whenever there is a new package available, you need to upgrade your package on your machine to receive the latest apps so follow the instructions on the releases page at [https://github.com/noderators/elastos-supernode-setup/releases](https://github.com/noderators/elastos-supernode-setup/releases) 
 
 ## Roadmap for this repository
-- Update the deb packages with metrics service so the daemons start producing meaningful metrics that can be used to watch over your supernodes 
 - Update the deb packages so if the node goes down, it alerts via SMS or email
 
 ## Noderators - Jazz(US - Ohio)
