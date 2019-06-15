@@ -4,8 +4,8 @@ After=network-online.target
 
 [Service]
 Type=simple
-WorkingDirectory=/data/elastos/supernodemetrics
-EnvironmentFile=/etc/elastos-supernodemetrics/params.env
+WorkingDirectory=/data/elastos/metrics
+EnvironmentFile=/etc/elastos-metrics/params_supernode.env
 ExecStart=/usr/local/bin/elastos-shell2http             \
             -port=${PORT}                               \
             -basic-auth="${AUTH_USER}:${AUTH_PASSWORD}" \

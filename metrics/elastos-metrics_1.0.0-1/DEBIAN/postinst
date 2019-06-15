@@ -8,6 +8,10 @@ adduser --system \
         --home /data/elastos \
         elauser
 
-mkdir -p /data/elastos/supernodemetrics
-chown -R elauser:elauser /data/elastos/supernodemetrics
+mkdir -p /data/elastos/metrics
+chown -R elauser:elauser /data/elastos/metrics
+sysctl -w kernel.perf_event_paranoid=0
+systemctl enable prometheus prometheus-node-exporter prometheus-pushgateway prometheus-alertmanager
+cp /data/elastos/metrics/prometheus /etc/default/prometheus
+cp /data/elastos/metrics/prometheus-node-exporter /etc/default/prometheus-node-exporter
 systemctl restart prometheus prometheus-node-exporter prometheus-pushgateway prometheus-alertmanager

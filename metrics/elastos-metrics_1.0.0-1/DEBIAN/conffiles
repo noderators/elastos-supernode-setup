@@ -1,0 +1,4 @@
+/data/elastos/metrics/prometheus.yml
+/data/elastos/metrics/prometheus
+/data/elastos/metrics/prometheus-node-exporter
+/etc/elastos-metrics/params_supernode.env

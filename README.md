@@ -22,7 +22,9 @@
 
 3. Install the packages
     ```
-    sudo dpkg -i elastos-carrier-bootstrap_5.2.3-2.deb elastos-did_0.1.2-2.deb elastos-ela_0.3.2-2.deb elastos-token_0.1.2-2.deb elastos-metrics_1.0.0-1.deb;
+    sudo dpkg -i elastos-carrier-bootstrap_5.2.3-2.deb elastos-did_0.1.2-2.deb elastos-ela_0.3.2-2.deb elastos-token_0.1.2-2.deb;
+    sudo apt-get install prometheus prometheus-node-exporter prometheus-pushgateway prometheus-alertmanager;
+    sudo dpkg -i elastos-metrics_1.0.0-1.deb;
     sudo apt-get install -f
     ```
 
@@ -53,14 +55,38 @@
 6. Update /data/elastos/carrier/bootstrap.conf
     - Change "external_ip" to your own public IP address. Make sure to remove the 2 backslashes "//" from the line too
 
-7. Once all the changes are in place, enable your services to start on boot
+7. Update /etc/elastos-metrics/params_supernode.env
+    - Change "PORT", "AUTH_USER" and "AUTH_PASSWORD" to your own choosing
+
+8. Once all the changes are in place, enable your services to start on boot
     ```
-    sudo systemctl enable elastos-ela elastos-did elastos-token elastos-carrier-bootstrap
+    sudo systemctl enable elastos-ela elastos-did elastos-token elastos-carrier-bootstrap elastos-supernodemetrics
     ```
 
-8. Now, start up your services
+9. Now, start up your services
     ```
-    sudo systemctl start elastos-ela elastos-did elastos-token elastos-carrier-bootstrap
+    sudo systemctl restart elastos-ela elastos-did elastos-token elastos-carrier-bootstrap elastos-supernodemetrics
+    ``` 
+
+## Check your metrics
+- Check the metrics that's being scraped through prometheus-node-exporter service
+    ```
+    curl http://localhost:9100/metrics | grep elastos-
+    ```
+- You can also check other metrics. Visit [https://github.com/prometheus/node_exporter](https://github.com/prometheus/node_exporter) for more info
+- With node exporter, metrics about your server is exposed. Some of them include:
+    ```
+    curl http://localhost:9100/metrics | grep node_filesystem_size | grep "/data"
+    ```
+    Should return the total size of your /data directory where all the supernode blockchain data is stored
+
+    ```
+    curl http://localhost:9100/metrics | grep node_filesystem_free | grep "/data"
+    ```
+    Should return the available size of your /data directory so you can expand your volume when it's about to be full. 
+- By default, elastos-supernodemetrics is running on port 5000 so what it does is expose all the node-exporter metrics to an API port and in JSON format so you can use this in your own applications to gather statistics about your supernode 
+    ```
+    curl --user user:password http://localhost:5000/supernodemetrics
     ```
 
 ## Upgrade instructions

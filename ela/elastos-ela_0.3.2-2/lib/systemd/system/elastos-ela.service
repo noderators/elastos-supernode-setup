@@ -6,7 +6,9 @@ After=network-online.target
 Type=simple
 WorkingDirectory=/data/elastos/ela
 EnvironmentFile=/etc/elastos-ela/params.env
-ExecStart=echo ${KEYSTORE_PASSWORD} | /usr/local/bin/elastos-ela --conf ${CONFIG_FILE}
+ExecStart=/usr/local/bin/elastos-ela    \
+            --conf ${CONFIG_FILE}       \
+            -p ${KEYSTORE_PASSWORD}
             
 User=elauser
 Group=elauser

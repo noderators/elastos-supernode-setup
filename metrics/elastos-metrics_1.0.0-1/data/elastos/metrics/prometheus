@@ -1,6 +1,6 @@
 # Set the command-line arguments to pass to the server.
-ARGS="--config.file=\"/data/metrics/prometheus.yml\" \
-      --web.listen-address=\"0.0.0.0:9090\""
+ARGS='--config.file="/data/metrics/prometheus.yml" \
+      --web.listen-address="0.0.0.0:9090"'
 
 # Prometheus supports the following options:
 #  --config.file="/etc/prometheus/prometheus.yml"
