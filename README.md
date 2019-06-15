@@ -64,7 +64,8 @@
     ```
 
 ## Upgrade instructions
-Whenever there is a new package available, you need to upgrade your package on your machine to receive the latest apps so follow the instructions on the releases page at [https://github.com/noderators/elastos-supernode-setup/releases](https://github.com/noderators/elastos-supernode-setup/releases) 
+- Whenever there is a new package available, you need to upgrade your package on your machine to receive the latest apps so follow the instructions on the releases page at [https://github.com/noderators/elastos-supernode-setup/releases](https://github.com/noderators/elastos-supernode-setup/releases) 
+- You should always check all your configs everytime you upgrade your packages because sometimes, the config files won't change while other times, they might change. Be sure to follow upgrade instructions on releases page
 
 ## Roadmap for this repository
 - Update the deb packages so if the node goes down, it alerts via SMS or email
