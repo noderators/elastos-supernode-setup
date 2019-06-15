@@ -1,34 +1,29 @@
 ## Pre-requisites
 - Ubuntu Server 18.04 LTS
-
-## How to download the .deb packages(the easy way)
-
-- Go to [https://github.com/noderators/elastos-supernode-setup/releases](https://github.com/noderators/elastos-supernode-setup/releases) and download the latest releases
+- Docker(if you want to build the .deb packages)
 
 ## How to build and install everything yourself(the hard way)
 1. Build the .deb packages on your ubuntu machine
     ```
-    tools/build_packages.sh
+    docker build -t deb-builder:18.04 -f tools/Dockerfile-ubuntu-18.04 .;
+    docker run -it -w /elastos-supernode-setup -v /Users/kpachhai/dev/src/github.com/noderators/elastos-supernode-setup:/elastos-supernode-setup -e USER=501 -e GROUP=20 --rm deb-builder:18.04 /elastos-supernode-setup/tools/build_packages.sh
     ```
 
-2. Install elastos-ela
+2. Install the packages
     ```
-    sudo dpkg -i ela/elastos-ela_0.3.2-1.deb
-    ```
-
-3. Install elastos-did
-    ```
-    sudo dpkg -i did/elastos-did_0.1.2-1.deb
+    sudo dpkg -i ela/elastos-ela_0.3.2-2.deb did/elastos-did_0.1.2-2.deb token/elastos-token_0.1.2-2.deb carrier/elastos-carrier-bootstrap_5.2.3-2.deb metrics/elastos-metrics_1.0.0-1.deb;
+    sudo apt-get install -f
     ```
 
-4. Install elastos-token
-    ```
-    sudo dpkg -i token/elastos-token_0.1.2-1.deb
-    ```
+## How to download and install the packages(the easy way)
+1. Go to releases at [https://github.com/noderators/elastos-supernode-setup/releases](https://github.com/noderators/elastos-supernode-setup/releases)
 
-5. Install elastos-carrier-boostrap
+2. Download all the deb packages
+
+3. Install the packages
     ```
-    sudo dpkg -i carrier/elastos-carrier-bootstrap_5.2.3-1.deb
+    sudo dpkg -i elastos-carrier-bootstrap_5.2.3-2.deb elastos-did_0.1.2-2.deb elastos-ela_0.3.2-2.deb elastos-token_0.1.2-2.deb elastos-metrics_1.0.0-1.deb;
+    sudo apt-get install -f
     ```
 
 ## Change configs

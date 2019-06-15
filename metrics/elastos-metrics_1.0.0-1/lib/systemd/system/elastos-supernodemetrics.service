@@ -1,0 +1,21 @@
+[Unit]
+Description=Elastos Supernode Metrics Daemon
+After=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/data/elastos/supernodemetrics
+EnvironmentFile=/etc/elastos-supernodemetrics/params.env
+ExecStart=/usr/local/bin/elastos-shell2http             \
+            -port=${PORT}                               \
+            -basic-auth="${AUTH_USER}:${AUTH_PASSWORD}" \
+            -timeout=${TIMEOUT}                         \
+            ${API_ENDPOINT}                             \
+            "${SHELL_COMMAND}"
+            
+User=elauser
+Group=elauser
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

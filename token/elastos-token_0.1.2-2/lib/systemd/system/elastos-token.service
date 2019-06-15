@@ -1,0 +1,15 @@
+[Unit]
+Description=Elastos Token Sidechain Node Daemon
+After=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/data/elastos/token
+ExecStart=/usr/local/bin/elastos-token
+
+User=elauser
+Group=elauser
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

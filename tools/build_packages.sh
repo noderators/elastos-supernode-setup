@@ -1,14 +1,5 @@
 #!/bin/bash
 
-while getopts ":i:" opt; do
-  case $opt in
-    i) INSTALL="$OPTARG"
-    ;;
-    \?) echo "Invalid option -$OPTARG" >&2
-    ;;
-  esac
-done
-
 CURR_DIR=$(pwd)
 
 function build_deb_package() {
@@ -29,13 +20,15 @@ function build_deb_package() {
     cd $CURR_DIR
 }
 
-build_deb_package ela elastos-ela_0.3.2-1 elastos-ela
+build_deb_package ela elastos-ela_0.3.2-2 elastos-ela
 
-build_deb_package did elastos-did_0.1.2-1 elastos-did 
+build_deb_package did elastos-did_0.1.2-2 elastos-did 
 
-build_deb_package token elastos-token_0.1.2-1 elastos-token 
+build_deb_package token elastos-token_0.1.2-2 elastos-token 
 
-build_deb_package carrier elastos-carrier-bootstrap_5.2.3-1 elastos-carrier-bootstrap
+build_deb_package carrier elastos-carrier-bootstrap_5.2.3-2 elastos-carrier-bootstrap
+
+build_deb_package metrics elastos-metrics_1.0.0-1 elastos-metrics
 
 cd $CURR_DIR
 

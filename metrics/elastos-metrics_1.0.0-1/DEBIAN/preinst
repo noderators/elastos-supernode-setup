@@ -1,0 +1,4 @@
+#!/bin/sh
+
+sysctl -w kernel.perf_event_paranoid=0
+systemctl enable prometheus prometheus-node-exporter prometheus-pushgateway prometheus-alertmanager
