@@ -65,7 +65,7 @@
 
 9. Now, start up your services
     ```
-    sudo systemctl restart elastos-ela elastos-did elastos-token elastos-carrier-bootstrap elastos-supernodemetrics
+    sudo systemctl restart elastos-ela elastos-did elastos-token elastos-carrier-bootstrap elastos-supernodemetrics prometheus prometheus-node-exporter
     ``` 
 
 ## Check your metrics
