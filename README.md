@@ -30,6 +30,7 @@
 ## Change configs
 1. Replace /data/elastos/ela/keystore.dat with your own keystore.dat
     ```
+    rm -f /data/elastos/ela/keystore.dat;
     /usr/local/bin/elastos-ela-cli wallet create -p $YOURPASSWORDHERE
     cp keystore.dat /data/elastos/ela/keystore.dat
     sudo chown elauser:elauser /data/elastos/ela/keystore.dat
@@ -93,7 +94,7 @@
 - You should always check all your configs everytime you upgrade your packages because sometimes, the config files won't change while other times, they might change. Be sure to follow upgrade instructions on releases page
 - Any time you restart an instance, you're stopping the node for main chain, did sidechain, token sidehchain, etc and then starting them again. You should also make sure to not upgrade elastos-ela without first making sure that your supernode is not currently in queue to submit a block proposal. In the future, packages will be upgraded so you can upgrade without affecting the current running instance(we need to setup some failover option so our supernode is more robust) but for now, if you would like to upgrade your elastos-ela package and restart it, make sure your supernode is not in the queue to submit a block proposal for the next few minutes.
     ```
-    curl --user noderators:mods4ever -H 'Content-Type: application/json' -H 'Accept:application/json' --data '{"method":"getarbitersinfo"}' http://localhost:20336
+    curl --user user:password -H 'Content-Type: application/json' -H 'Accept:application/json' --data '{"method":"getarbitersinfo"}' http://localhost:20336
     ```
     Should return the current onduty supernode(arbiter) and the next list of supernodes in queue to submit block proposals every block(~2 minutes)
 
