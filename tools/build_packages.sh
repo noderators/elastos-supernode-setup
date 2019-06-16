@@ -4,31 +4,32 @@ CURR_DIR=$(pwd)
 
 function build_deb_package() {
     WORK_DIR="${1}"
-    PACKAGE_DIR="${2}"
-    PACKAGE_NAME="${3}"
+    PACKAGE_NAME="${2}"
+    VERSION="${3}"
 
     cd $WORK_DIR
-    dpkg-deb --build $PACKAGE_DIR
+    dpkg-deb --build $PACKAGE_NAME
     if [ "${INSTALL}" == "yes" ]
     then
         sudo apt-get remove -y $PACKAGE_NAME >/dev/null
         sudo systemctl stop $PACKAGE_NAME
-        sudo dpkg -i "${PACKAGE_DIR}.deb"
+        sudo dpkg -i "${PACKAGE_NAME}.deb"
         sudo systemctl daemon-reload
         sudo systemctl start $PACKAGE_NAME
     fi
+    mv "${PACKAGE_NAME}.deb" "${PACKAGE_NAME}_${VERSION}.deb"
     cd $CURR_DIR
 }
 
-build_deb_package ela elastos-ela_0.3.2-2 elastos-ela
+build_deb_package ela elastos-ela 0.3.3-1
 
-build_deb_package did elastos-did_0.1.2-2 elastos-did 
+build_deb_package did elastos-did 0.1.2-2
 
-build_deb_package token elastos-token_0.1.2-2 elastos-token 
+build_deb_package token elastos-token 0.1.2-2
 
-build_deb_package carrier elastos-carrier-bootstrap_5.2.3-2 elastos-carrier-bootstrap
+build_deb_package carrier elastos-carrier-bootstrap 5.2.3-2
 
-build_deb_package metrics elastos-metrics_1.0.0-1 elastos-metrics
+build_deb_package metrics elastos-metrics elastos-metrics 1.0.0-1
 
 cd $CURR_DIR
 
