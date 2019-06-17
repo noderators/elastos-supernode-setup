@@ -1,7 +1,7 @@
 {
   "SPVDisableDNS": false,
   "SPVPermanentPeers": [
-    "127.0.0.1:20338"
+    "localhost:20338"
   ],
   "EnableRPC": true,
   "RPCUser": "user",
