@@ -68,6 +68,19 @@
     sudo systemctl restart elastos-ela elastos-did elastos-token elastos-carrier-bootstrap elastos-supernodemetrics prometheus prometheus-node-exporter
     ``` 
 
+10. In case your node becomes inactive for whatever reason, please do the following to move to active status again
+    ```
+    cd /data/elastos/ela;
+    sudo su;
+    KEYSTORE_PASSWORD='YOUROWNKEYSTOREPASSWORDHERE';
+    RPCUSERNAME='YOURRPCUSERNAMEHERE';
+    RPCPASSWORD='YOURRPCPASSHERE';
+    YOURNODEKEY=$(elastos-ela-cli wallet a -p $KEYSTORE_PASSWORD | tail -2 | head -1 | cut -d' ' -f2);
+    elastos-ela-cli wallet buildtx activate --nodepublickey $YOURNODEKEY -p $KEYSTORE_PASSWORD;
+    elastos-ela-cli wallet sendtx -f ready_to_send.txn --rpcuser $RPCUSERNAME --rpcpassword $RPCPASSWORD;
+    rm -f ready_to_send.txn
+    ```
+
 ## Check your metrics
 - Check the metrics that's being scraped through prometheus-node-exporter service
     ```
