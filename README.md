@@ -11,7 +11,7 @@
 
 2. Install the packages
     ```
-    sudo dpkg -i --force-confmiss ela/elastos-ela_0.3.3-1.deb did/elastos-did_0.1.2-2.deb token/elastos-token_0.1.2-2.deb carrier/elastos-carrier-bootstrap_5.2.3-2.deb metrics/elastos-metrics_1.0.0-1.deb;
+    sudo dpkg -i --force-confmiss ela/elastos-ela_0.3.4-1.deb did/elastos-did_0.1.2-2.deb token/elastos-token_0.1.2-2.deb carrier/elastos-carrier-bootstrap_5.2.3-2.deb metrics/elastos-metrics_1.0.0-1.deb;
     sudo apt-get install -f
     ```
 
@@ -23,7 +23,7 @@
 3. Install the packages
     ```
     sudo apt-get install prometheus prometheus-node-exporter prometheus-pushgateway prometheus-alertmanager;
-    sudo dpkg -i --force-confmiss elastos-carrier-bootstrap_5.2.3-2.deb elastos-did_0.1.2-2.deb elastos-ela_0.3.3-1.deb elastos-token_0.1.2-2.deb elastos-metrics_1.0.0-1.deb;
+    sudo dpkg -i --force-confmiss elastos-carrier-bootstrap_5.2.3-2.deb elastos-did_0.1.2-2.deb elastos-ela_0.3.4-1.deb elastos-token_0.1.2-2.deb elastos-metrics_1.0.0-1.deb;
     sudo apt-get install -f
     ```
 
@@ -114,8 +114,6 @@
 ## Roadmap for this repository
 - Update the deb packages so if the node goes down, it alerts via SMS or email
 
-## Noderators - Jazz(US - Ohio)
-
-## Noderators - Champagne(Europe - Frankfurt)
+## Noderators - Champagne(US - Ohio)
 
 ## Noderators - Watermelon(Asia - Mumbai)
