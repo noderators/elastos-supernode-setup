@@ -10,3 +10,4 @@ adduser --system \
 
 mkdir -p /data/elastos/carrier/db
 chown -R elauser:elauser /data/elastos/carrier
+systemctl enable elastos-carrier-bootstrap

@@ -1,10 +1,10 @@
 Package: elastos-metrics
 Source: noderators
-Version: 1.0.0-1
+Version: 1.1.0-1
 Architecture: amd64
 Maintainer: Kiran Pachhai <kiran.pachhai@gmail.com>
 Pre-Depends: adduser
-Depends: libsystemd0, prometheus, prometheus-node-exporter, prometheus-pushgateway, prometheus-alertmanager
+Depends: libsystemd0, jq, python3, elastos-ela, elastos-did, elastos-carrier-bootstrap, prometheus, prometheus-node-exporter, prometheus-pushgateway, prometheus-alertmanager
 Homepage: http://www.noderators.org/
 Description: Elastos Metrics (daemon)
  Elastos Metrics exposes various metrics of the supernode to Prometheus and also makes 

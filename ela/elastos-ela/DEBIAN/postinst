@@ -10,3 +10,4 @@ adduser --system \
 
 mkdir -p /data/elastos/ela
 chown -R elauser:elauser /data/elastos/ela
+systemctl enable elastos-ela

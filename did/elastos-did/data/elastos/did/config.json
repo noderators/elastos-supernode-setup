@@ -4,6 +4,7 @@
     "localhost:20338"
   ],
   "EnableRPC": true,
+  "RPCPort": 20606,
   "RPCUser": "user",
   "RPCPass": "password",
   "RPCWhiteList": [

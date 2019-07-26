@@ -5,8 +5,27 @@
 ARGS='--collector.diskstats.ignored-devices=^(ram|loop|fd|(h|s|v|xv)d[a-z]|nvme\\d+n\\d+p)\\d+$ \
       --collector.filesystem.ignored-mount-points=^/(sys|proc|dev|run)($|/) \
       --collector.netdev.ignored-devices=^lo$ \
-      --collector.textfile.directory=/var/lib/prometheus/node-exporter \
+      --collector.textfile.directory=/data/elastos/metrics/prometheus/node-exporter \
       --collector.systemd \
+      --collector.systemd.unit-whitelist="elastos.+" \
+      --no-collector.arp \
+      --no-collector.bcache \
+      --no-collector.edac \
+      --no-collector.entropy \
+      --no-collector.filefd \
+      --no-collector.hwmon \
+      --no-collector.infiniband \
+      --no-collector.ipvs \
+      --no-collector.mdadm \
+      --no-collector.netdev \
+      --no-collector.netstat \
+      --no-collector.sockstat \
+      --no-collector.stat \
+      --no-collector.vmstat \
+      --no-collector.wifi \
+      --no-collector.xfs \
+      --no-collector.zfs \
+      --no-collector.timex \
       --web.listen-address=":9100"'
 
 # Prometheus-node-exporter supports the following options:

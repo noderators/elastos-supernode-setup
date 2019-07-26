@@ -34,3 +34,7 @@ scrape_configs:
     # machine by default.
     static_configs:
       - targets: ['localhost:9100']
+    metric_relabel_configs:
+      - source_labels: [__name__]
+        regex: .*(cpu|disk_bytes|filesystem_free|filesystem_size|load5|memory_MemFree|memory_MemTotal|uname_info).*
+        action: keep

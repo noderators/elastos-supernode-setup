@@ -2,9 +2,10 @@
   "Configuration": {
     "DPoSConfiguration": {
       "EnableArbiter": true,
-      "IPAddress": "127.0.0.1"
+      "IPAddress": "localhost"
     },
     "EnableRPC": true,
+    "HttpJsonPort": 20336,
     "RpcConfiguration": {
       "User": "user",
       "Pass": "password",

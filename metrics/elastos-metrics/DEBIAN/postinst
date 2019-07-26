@@ -8,10 +8,15 @@ adduser --system \
         --home /data/elastos \
         elauser
 
-mkdir -p /data/elastos/metrics
+mkdir -p /data/elastos/metrics/prometheus/node-exporter /data/elastos/metrics/prometheus/metrics2 /data/elastos/metrics/prometheus/alertmanager
 chown -R elauser:elauser /data/elastos/metrics
+chown -R prometheus:prometheus /data/elastos/metrics/prometheus
+chown -R root:root /etc/cron.d/elastos-metrics
+chmod 644 /etc/cron.d/elastos-metrics
 sysctl -w kernel.perf_event_paranoid=0
-systemctl enable prometheus prometheus-node-exporter prometheus-pushgateway prometheus-alertmanager
-cp /data/elastos/metrics/prometheus /etc/default/prometheus
-cp /data/elastos/metrics/prometheus-node-exporter /etc/default/prometheus-node-exporter
-systemctl restart prometheus prometheus-node-exporter prometheus-pushgateway prometheus-alertmanager
+systemctl enable elastos-metrics prometheus prometheus-node-exporter prometheus-pushgateway prometheus-alertmanager
+cp /data/elastos/metrics/conf/prometheus /etc/default/prometheus
+cp /data/elastos/metrics/conf/prometheus-node-exporter /etc/default/prometheus-node-exporter
+cp /data/elastos/metrics/conf/prometheus-pushgateway /etc/default/prometheus-pushgateway
+cp /data/elastos/metrics/conf/prometheus-alertmanager /etc/default/prometheus-alertmanager
+systemctl restart elastos-metrics prometheus prometheus-node-exporter prometheus-pushgateway prometheus-alertmanager

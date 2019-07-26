@@ -21,15 +21,15 @@ function build_deb_package() {
     cd $CURR_DIR
 }
 
-build_deb_package ela elastos-ela 0.3.4-1
+build_deb_package ela elastos-ela 0.3.4-2
 
-build_deb_package did elastos-did 0.1.2-2
+build_deb_package did elastos-did 0.1.2-3
 
-build_deb_package token elastos-token 0.1.2-2
+build_deb_package token elastos-token 0.1.2-3
 
 build_deb_package carrier elastos-carrier-bootstrap 5.2.3-2
 
-build_deb_package metrics elastos-metrics elastos-metrics 1.0.0-1
+build_deb_package metrics elastos-metrics 1.1.0-1
 
 cd $CURR_DIR
 

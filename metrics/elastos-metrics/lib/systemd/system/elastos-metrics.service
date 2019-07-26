@@ -1,11 +1,11 @@
 [Unit]
-Description=Elastos Supernode Metrics Daemon
+Description=Elastos Metrics Daemon
 After=network-online.target
 
 [Service]
 Type=simple
 WorkingDirectory=/data/elastos/metrics
-EnvironmentFile=/etc/elastos-metrics/params_supernode.env
+EnvironmentFile=/etc/elastos-metrics/params.env
 ExecStart=/usr/local/bin/elastos-shell2http             \
             -port=${PORT}                               \
             -basic-auth="${AUTH_USER}:${AUTH_PASSWORD}" \

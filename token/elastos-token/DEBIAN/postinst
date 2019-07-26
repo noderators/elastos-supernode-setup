@@ -10,3 +10,4 @@ adduser --system \
 
 mkdir -p /data/elastos/token 
 chown -R elauser:elauser /data/elastos/token
+systemctl enable elastos-token

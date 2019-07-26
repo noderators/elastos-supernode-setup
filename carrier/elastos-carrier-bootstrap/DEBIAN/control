@@ -1,6 +1,6 @@
 Package: elastos-carrier-bootstrap
 Source: noderators
-Version: 5.2.3-1
+Version: 5.2.3-2
 Architecture: amd64
 Maintainer: Kiran Pachhai <kiran.pachhai@gmail.com>
 Pre-Depends: adduser

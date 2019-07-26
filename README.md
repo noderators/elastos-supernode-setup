@@ -11,7 +11,7 @@
 
 2. Install the packages
     ```
-    sudo dpkg -i --force-confmiss ela/elastos-ela_0.3.4-1.deb did/elastos-did_0.1.2-2.deb token/elastos-token_0.1.2-2.deb carrier/elastos-carrier-bootstrap_5.2.3-2.deb metrics/elastos-metrics_1.0.0-1.deb;
+    sudo dpkg -i --force-confmiss ela/elastos-ela_0.3.4-2.deb did/elastos-did_0.1.2-3.deb token/elastos-token_0.1.2-3.deb carrier/elastos-carrier-bootstrap_5.2.3-2.deb metrics/elastos-metrics_1.1.0-1.deb;
     sudo apt-get install -f
     ```
 
@@ -22,8 +22,8 @@
 
 3. Install the packages
     ```
-    sudo apt-get install prometheus prometheus-node-exporter prometheus-pushgateway prometheus-alertmanager;
-    sudo dpkg -i --force-confmiss elastos-carrier-bootstrap_5.2.3-2.deb elastos-did_0.1.2-2.deb elastos-ela_0.3.4-1.deb elastos-token_0.1.2-2.deb elastos-metrics_1.0.0-1.deb;
+    sudo apt-get install prometheus prometheus-node-exporter prometheus-pushgateway prometheus-alertmanager jq python3;
+    sudo dpkg -i --force-confmiss elastos-ela_0.3.4-2.deb elastos-did_0.1.2-3.deb elastos-token_0.1.2-3.deb elastos-carrier-bootstrap_5.2.3-2.deb elastos-metrics_1.1.0-1.deb;
     sudo apt-get install -f
     ```
 
@@ -40,6 +40,10 @@
     - Change "IPAddress" to your own public IP address
     - Change "User" to your own username you want to set
     - Change "Pass" to your own password you want to set
+    - Change "HttpJsonPort" to the port of your choosing
+    - If you want to enable REST API Port, add 
+        ```"HttpRestStart": true,```
+    - Change "HttpRestPort" to the port of your choosing
 
 3. Update /etc/elastos-ela/params.env
     - Change "KEYSTORE_PASSWORD" to your own keystore password you set above(whatever $YOURPASSWORDHERE is)
@@ -47,10 +51,18 @@
 4. Update /data/elastos/did/config.json
     - Change "RPCUser" to your own username you want to set
     - Change "RPCPass" to your own username you want to set
+    - Change "RPCPort" to the port of your choosing
+    - If you want to enable REST API Port, add 
+        ```"EnableREST": true,```
+    - Change "RESTPort" to the port of your choosing
 
 5. Update /data/elastos/token/config.json
     - Change "RPCUser" to your own username you want to set
     - Change "RPCPass" to your own username you want to set
+    - Change "RPCPort" to the port of your choosing
+    - If you want to enable REST API Port, add 
+        ```"EnableREST": true,```
+    - Change "RESTPort" to the port of your choosing
 
 6. Update /data/elastos/carrier/bootstrap.conf
     - Change "external_ip" to your own public IP address. Make sure to remove the 2 backslashes "//" from the line too
@@ -60,12 +72,12 @@
 
 8. Once all the changes are in place, enable your services to start on boot
     ```
-    sudo systemctl enable elastos-ela elastos-did elastos-token elastos-carrier-bootstrap elastos-supernodemetrics
+    sudo systemctl enable elastos-ela elastos-did elastos-token elastos-carrier-bootstrap elastos-metrics
     ```
 
 9. Now, start up your services
     ```
-    sudo systemctl restart elastos-ela elastos-did elastos-token elastos-carrier-bootstrap elastos-supernodemetrics prometheus prometheus-node-exporter
+    sudo systemctl restart elastos-ela elastos-did elastos-token elastos-carrier-bootstrap elastos-metrics prometheus prometheus-node-exporter prometheus-pushgateway prometheus-alertmanager
     ``` 
 
 10. In case your node becomes inactive for whatever reason, please do the following to move to active status again
@@ -97,14 +109,13 @@
     curl http://localhost:9100/metrics | grep node_filesystem_free | grep "/data"
     ```
     Should return the available size of your /data directory so you can expand your volume when it's about to be full. 
-- By default, elastos-supernodemetrics is running on port 5000 so what it does is expose all the node-exporter metrics to an API port and in JSON format so you can use this in your own applications to gather statistics about your supernode 
+- By default, elastos-metrics is running on port 5000 so what it does is expose all the node-exporter metrics to an API port and in JSON format so you can use this in your own applications to gather statistics about your supernode 
     ```
-    curl --user user:password http://localhost:5000/supernodemetrics
+    curl --user user:password http://localhost:5000/elastosmetrics
     ```
 
 ## Upgrade instructions
 - Whenever there is a new package available, you need to upgrade your package on your machine to receive the latest apps so follow the instructions on the releases page at [https://github.com/noderators/elastos-supernode-setup/releases](https://github.com/noderators/elastos-supernode-setup/releases) 
-- You should always check all your configs everytime you upgrade your packages because sometimes, the config files won't change while other times, they might change. Be sure to follow upgrade instructions on releases page
 - Any time you restart an instance, you're stopping the node for main chain, did sidechain, token sidehchain, etc and then starting them again. You should also make sure to not upgrade elastos-ela without first making sure that your supernode is not currently in queue to submit a block proposal. In the future, packages will be upgraded so you can upgrade without affecting the current running instance(we need to setup some failover option so our supernode is more robust) but for now, if you would like to upgrade your elastos-ela package and restart it, make sure your supernode is not in the queue to submit a block proposal for the next few minutes.
     ```
     curl --user user:password -H 'Content-Type: application/json' -H 'Accept:application/json' --data '{"method":"getarbitersinfo"}' http://localhost:20336
