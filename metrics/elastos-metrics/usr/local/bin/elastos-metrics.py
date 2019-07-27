@@ -23,8 +23,7 @@ def main():
     height = node_state["height"]
     node_version = node_state["compile"]
     services = node_state["services"]
-    print(height, node_version, services)
-    with open("/data/elastos/metrics/prometheus/node-exporter/elastos-metrics.prom", "a") as out:
+    with open("/data/elastos/metrics/prometheus/node-exporter/elastos-metrics.prom", "w") as out:
         out.write(f'elastos_metrics_nodestate{{chain="main",height="{height}",nodeversion="{node_version}",services="{services}"}} 1\n')
 
     # DPoS Node Info
@@ -37,13 +36,21 @@ def main():
     #producer_location = producer["location"]
     #producer_active = producer["active"]
     #producer_votes = producer["votes"]
-    producer_state = producer["state"]
+    producer_states = {"Pending": 1, "Active": 2, "Inactive": 3, "Canceled": 4, "Illegal": 5, "Returned": 6}
+    producer_state_raw = producer["state"]
+    producer_state = producer_states[producer_state_raw]
     producer_registerheight = producer["registerheight"]
     producer_cancelheight = producer["cancelheight"]
     producer_inactiveheight = producer["inactiveheight"]
     producer_illegalheight = producer["illegalheight"]
     producer_rank = producer["index"] + 1
-    print(producer_nickname, producer_rank, producer_ownerpublickey, producer_nodepublickey, producer_state, producer_registerheight, producer_cancelheight, producer_inactiveheight, producer_illegalheight)
+    with open("/data/elastos/metrics/prometheus/node-exporter/elastos-metrics.prom", "a") as out:
+        out.write(f'elastos_metrics_dpos_rank{{height="{height}",nickname="{producer_nickname}",ownerpublickey="{producer_ownerpublickey}",nodepublickey="{producer_nodepublickey}"}} {producer_rank}\n')
+        out.write(f'elastos_metrics_dpos_state{{height="{height}",nickname="{producer_nickname}",ownerpublickey="{producer_ownerpublickey}",nodepublickey="{producer_nodepublickey}",state="{producer_state_raw}"}} {producer_state}\n')
+        out.write(f'elastos_metrics_dpos_registerheight{{height="{height}",nickname="{producer_nickname}",ownerpublickey="{producer_ownerpublickey}",nodepublickey="{producer_nodepublickey}"}} {producer_registerheight}\n')
+        out.write(f'elastos_metrics_dpos_cancelheight{{height="{height}",nickname="{producer_nickname}",ownerpublickey="{producer_ownerpublickey}",nodepublickey="{producer_nodepublickey}"}} {producer_cancelheight}\n')
+        out.write(f'elastos_metrics_dpos_inactiveheight{{height="{height}",nickname="{producer_nickname}",ownerpublickey="{producer_ownerpublickey}",nodepublickey="{producer_nodepublickey}"}} {producer_inactiveheight}\n')
+        out.write(f'elastos_metrics_dpos_illegalheight{{height="{height}",nickname="{producer_nickname}",ownerpublickey="{producer_ownerpublickey}",nodepublickey="{producer_nodepublickey}"}} {producer_illegalheight}\n')
 
     # DID Sidechain Node State
     rpcport, rpcuser, rpcpassword = getConfigs("/data/elastos/did/config.json", chain="did")
@@ -51,7 +58,6 @@ def main():
     height = node_state["height"]
     node_version = node_state["compile"]
     services = node_state["services"]
-    print(height, node_version, services)
     with open("/data/elastos/metrics/prometheus/node-exporter/elastos-metrics.prom", "a") as out:
         out.write(f'elastos_metrics_nodestate{{chain="did",height="{height}",nodeversion="{node_version}",services="{services}"}} 1\n')
 
@@ -61,7 +67,6 @@ def main():
     height = node_state["height"]
     node_version = node_state["compile"]
     services = node_state["services"]
-    print(height, node_version, services)
     with open("/data/elastos/metrics/prometheus/node-exporter/elastos-metrics.prom", "a") as out:
         out.write(f'elastos_metrics_nodestate{{chain="token",height="{height}",nodeversion="{node_version}",services="{services}"}} 1\n')
 
