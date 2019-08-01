@@ -1,11 +1,13 @@
-## Pre-requisites
+## Pre-requisites for running the supernode
 - Ubuntu Server 18.04 LTS
+
+## Pre-requisites for building the packages yourself
 - Docker(if you want to build the .deb packages)
 
 ## How to build and install everything yourself(the hard way)
 1. Build the .deb packages on your ubuntu machine
     ```
-    docker build -t deb-builder:18.04 -f tools/Dockerfile-ubuntu-18.04 .;
+    docker build -t deb-builder:18.04 -f tools/ubuntu-18.04.Dockerfile .;
     docker run -it -w /elastos-supernode-setup -v /Users/kpachhai/dev/src/github.com/noderators/elastos-supernode-setup:/elastos-supernode-setup -e USER=501 -e GROUP=20 --rm deb-builder:18.04 /elastos-supernode-setup/tools/build_packages.sh
     ```
 
@@ -116,7 +118,8 @@
 
 ## Upgrade instructions
 - Whenever there is a new package available, you need to upgrade your package on your machine to receive the latest apps so follow the instructions on the releases page at [https://github.com/noderators/elastos-supernode-setup/releases](https://github.com/noderators/elastos-supernode-setup/releases) 
-- Any time you restart an instance, you're stopping the node for main chain, did sidechain, token sidehchain, etc and then starting them again. You should also make sure to not upgrade elastos-ela without first making sure that your supernode is not currently in queue to submit a block proposal. In the future, packages will be upgraded so you can upgrade without affecting the current running instance(we need to setup some failover option so our supernode is more robust) but for now, if you would like to upgrade your elastos-ela package and restart it, make sure your supernode is not in the queue to submit a block proposal for the next few minutes.
+- Any time you restart an instance, you're stopping the node for main chain, did sidechain, token sidehchain, etc and then starting them again. You should also make sure to not upgrade elastos-ela without first making sure that your supernode is not currently in queue to submit a block proposal. You can check when your supernode will be proposing a block next by going to [https://www.noderators.org/arbitratorsonduty/](https://www.noderators.org/arbitratorsonduty/)
+- You can also check for this using your command line by doing the following
     ```
     curl --user user:password -H 'Content-Type: application/json' -H 'Accept:application/json' --data '{"method":"getarbitersinfo"}' http://localhost:20336
     ```
@@ -124,6 +127,8 @@
 
 ## Roadmap for this repository
 - Update the deb packages so if the node goes down, it alerts via SMS or email
+- Support redhat/centos machines by putting out rpm packages in addition to deb packages
+- Create a grafana dashboard for your supernode using elastos-metrics package
 
 ## Noderators - Champagne(US - Ohio)
 
