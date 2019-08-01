@@ -11,7 +11,7 @@
 
 2. Install the packages
     ```
-    sudo dpkg -i --force-confmiss ela/elastos-ela_0.3.4-2.deb did/elastos-did_0.1.2-3.deb token/elastos-token_0.1.2-3.deb carrier/elastos-carrier-bootstrap_5.2.3-2.deb metrics/elastos-metrics_1.1.0-1.deb;
+    sudo dpkg -i --force-confmiss ela/elastos-ela_0.3.5-1.deb did/elastos-did_0.1.2-3.deb token/elastos-token_0.1.2-3.deb carrier/elastos-carrier-bootstrap_5.2.3-2.deb metrics/elastos-metrics_1.1.0-1.deb;
     sudo apt-get install -f
     ```
 
@@ -23,7 +23,7 @@
 3. Install the packages
     ```
     sudo apt-get install prometheus prometheus-node-exporter prometheus-pushgateway prometheus-alertmanager jq python3;
-    sudo dpkg -i --force-confmiss elastos-ela_0.3.4-2.deb elastos-did_0.1.2-3.deb elastos-token_0.1.2-3.deb elastos-carrier-bootstrap_5.2.3-2.deb elastos-metrics_1.1.0-1.deb;
+    sudo dpkg -i --force-confmiss elastos-ela_0.3.5-1.deb elastos-did_0.1.2-3.deb elastos-token_0.1.2-3.deb elastos-carrier-bootstrap_5.2.3-2.deb elastos-metrics_1.1.0-1.deb;
     sudo apt-get install -f
     ```
 
