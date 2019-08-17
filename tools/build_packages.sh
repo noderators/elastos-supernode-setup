@@ -1,5 +1,14 @@
 #!/bin/bash
 
+while getopts ":i:" opt; do
+  case $opt in
+    i) INSTALL="$OPTARG"
+    ;;
+    \?) echo "Invalid option -$OPTARG" >&2
+    ;;
+  esac
+done
+
 CURR_DIR=$(pwd)
 
 function build_deb_package() {
