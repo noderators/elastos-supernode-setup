@@ -104,12 +104,11 @@ def getNodeState(session, rpcport, rpcuser, rpcpassword):
     return data
 
 def getConfigs(config_file, chain="main"):
-    with open(config_file, 'r') as f:
-        config = f.read()
-    if chain == "main":
-        config_data = json.loads(config)["Configuration"]
-    elif chain == "did" or chain == "token":
-        config_data = json.loads(config)
+    with open(config_file, encoding='utf-8-sig') as f:
+        if chain == "main":
+            config_data = json.load(f)["Configuration"]
+        elif chain == "did" or chain == "token":
+            config_data = json.load(f)
 
     if chain == "main":
         try:

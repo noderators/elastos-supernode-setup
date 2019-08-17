@@ -1,0 +1,15 @@
+[Unit]
+Description=Ioex Mainchain Node Daemon
+After=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/data/ioex/mainchain
+ExecStart=/usr/local/bin/ioex-mainchain
+            
+User=ioexuser
+Group=ioexuser
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

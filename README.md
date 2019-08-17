@@ -13,7 +13,7 @@
 
 2. Install the packages
     ```
-    sudo dpkg -i --force-confmiss ela/elastos-ela_0.3.7-1.deb did/elastos-did_0.1.2-3.deb token/elastos-token_0.1.2-3.deb carrier/elastos-carrier-bootstrap_5.2.3-2.deb metrics/elastos-metrics_1.1.0-1.deb;
+    sudo dpkg -i --force-confmiss ela/elastos-ela_0.3.7-1.deb did/elastos-did_0.1.2-3.deb token/elastos-token_0.1.2-3.deb carrier/elastos-carrier-bootstrap_5.2.3-2.deb metrics/elastos-metrics_1.2.0-1.deb;
     sudo apt-get install -f
     ```
 
@@ -25,7 +25,7 @@
 3. Install the packages
     ```
     sudo apt-get install prometheus prometheus-node-exporter prometheus-pushgateway prometheus-alertmanager jq python3;
-    sudo dpkg -i --force-confmiss elastos-ela_0.3.7-1.deb elastos-did_0.1.2-3.deb elastos-token_0.1.2-3.deb elastos-carrier-bootstrap_5.2.3-2.deb elastos-metrics_1.1.0-1.deb;
+    sudo dpkg -i --force-confmiss elastos-ela_0.3.7-1.deb elastos-did_0.1.2-3.deb elastos-token_0.1.2-3.deb elastos-carrier-bootstrap_5.2.3-2.deb elastos-metrics_1.2.0-1.deb;
     sudo apt-get install -f
     ```
 
@@ -72,17 +72,12 @@
 7. Update /etc/elastos-metrics/params_supernode.env
     - Change "PORT", "AUTH_USER" and "AUTH_PASSWORD" to your own choosing
 
-8. Once all the changes are in place, enable your services to start on boot
-    ```
-    sudo systemctl enable elastos-ela elastos-did elastos-token elastos-carrier-bootstrap elastos-metrics
-    ```
-
-9. Now, start up your services
+8. Now, start up your services
     ```
     sudo systemctl restart elastos-ela elastos-did elastos-token elastos-carrier-bootstrap elastos-metrics prometheus prometheus-node-exporter prometheus-pushgateway prometheus-alertmanager
     ``` 
 
-10. In case your node becomes inactive for whatever reason, please do the following to move to active status again
+9. In case your node becomes inactive for whatever reason, please do the following to move to active status again
     ```
     cd /data/elastos/ela;
     sudo su;
@@ -130,6 +125,36 @@
 - Support redhat/centos machines by putting out rpm packages in addition to deb packages
 - Create a grafana dashboard for your supernode using elastos-metrics package
 
-## Noderators - Champagne(US - Ohio)
+## Ioex Mining
+If you want to, you can also use the same supernode server to run an ioeX mining node. This is entirely optional but if you install this, the metrics package from above will automatically start collecting metrics about your ioeX mining node.
 
-## Noderators - Watermelon(Asia - Mumbai)
+### How to download and install the packages(the easy way)
+1. Go to releases at [https://github.com/noderators/elastos-supernode-setup/releases](https://github.com/noderators/elastos-supernode-setup/releases)
+
+2. Download the deb package for ioex-mainchain
+
+3. Install the package
+    ```
+    sudo dpkg -i --force-confmiss ioex-mainchain_0.2.1-1.deb;
+    sudo apt-get install -f
+    ```
+
+### Change configs
+1. Update /data/ioex/mainchain/config.json
+    - Change "PayToAddr" to your own ioeX wallet address
+    - Change "MinerInfo" to your own miner name(You can set any name you want)
+
+2. Now, start up your ioeX mining service
+    ```
+    sudo systemctl restart ioex-mainchain
+    ``` 
+3. Don't forget to open ports 30338 and 30339. This part is required if you're deploying this node on something like AWS as AWS blocks all inbound ports by default. This process may be different depending on which platform you're using to deploy the supernode. For example, if on AWS, you would go to "EC2 > Security Groups > Inbound" and open up ports 30338 and 30339
+
+### Verify whether the mining node is running
+- `cd /data/ioex/mainchain && ioex-mainchain-cli info --height`
+
+### Use cli to check other info
+- `cd /data/ioex/mainchain && ioex-mainchain-cli info --state`
+- `cd /data/ioex/mainchain && ioex-mainchain-cli info --connections`
+- `cd /data/ioex/mainchain && ioex-mainchain-cli info --nbr`
+- `cd /data/ioex/mainchain && ioex-mainchain-cli wallet --balance EXeTCMMCtZTeL9DGmPuEuhSyPuZjfxsnXr`

@@ -1,0 +1,42 @@
+{
+  "Configuration": {
+    "Magic": 10209102,
+    "Version": 23,
+    "SeedList": [
+      "13.112.187.157:20338",
+      "52.193.180.23:20338",
+      "52.193.200.19:20338",
+      "52.198.121.69:20338",
+      "54.238.162.250:20338"
+    ],
+    "HttpInfoPort": 30333,
+    "HttpInfoStart": true,
+    "HttpRestPort": 30334,
+    "HttpWsPort": 30335,
+    "WsHeartbeatInterval": 60,
+    "HttpJsonPort": 30336,
+    "NodePort": 30338,
+    "NodeOpenPort": 30339,
+    "OpenService": false,
+    "PrintLevel": 5,
+    "MaxLogsSize": 0,
+    "MaxPerLogSize": 0,
+    "IsTLS": false,
+    "CertPath": "",
+    "KeyPath": "",
+    "CAPath": "",
+    "MultiCoreNum": 4,
+    "MaxTransactionInBlock": 10000,
+    "MaxBlockSize": 8000000,
+    "MinCrossChainTxFee": 10000,
+    "PowConfiguration": {
+      "PayToAddr": "EXeTCMMCtZTeL9DGmPuEuhSyPuZjfxsnXr",
+      "AutoMining": true,
+      "MinerInfo": "Noderators - Champagne",
+      "MinTxFee": 100,
+      "ActiveNet": "MainNet"
+    },
+    "Arbiters": [
+    ]
+  }
+}

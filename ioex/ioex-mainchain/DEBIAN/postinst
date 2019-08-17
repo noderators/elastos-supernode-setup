@@ -1,0 +1,13 @@
+#!/bin/sh
+
+adduser --system \
+        --quiet \
+        --group \
+        --no-create-home \
+        --disabled-password \
+        --home /data/ioex \
+        ioexuser
+
+mkdir -p /data/ioex/mainchain
+chown -R ioexuser:ioexuser /data/ioex/mainchain
+systemctl enable ioex-mainchain
