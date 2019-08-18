@@ -15,6 +15,7 @@ ExecStart=/usr/local/bin/elastos-shell2http                                     
                 jq -c '[.[] |                                                   \
                 select(                                                         \
                     (.name | contains(\"elastos\")) or                          \
+                    (.name | contains(\"ioex\")) or                             \
                     (.name | contains(\"node_cpu\")) or                         \
                     (.name | contains(\"node_disk\")) or                        \
                     (.name | contains(\"node_filesystem_size\")) or             \

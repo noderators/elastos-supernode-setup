@@ -74,7 +74,7 @@ def main():
     node_state = getNodeState(session, 30336)
     height = node_state["Height"]
     with open("/data/elastos/metrics/prometheus/node-exporter/ioex-metrics.prom", "a") as out:
-        out.write(f'ioex_metrics_nodestate{{chain="main",height="{height}"}} 1\n')
+        out.write(f'ioex_metrics_nodestate{{chain="ioexmain",height="{height}"}} 1\n')
 
 def getProducerInfo(session, rpcport, rpcuser, rpcpassword, nodekey):
     producer = {}
