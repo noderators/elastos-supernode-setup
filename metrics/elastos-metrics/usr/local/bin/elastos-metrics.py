@@ -73,8 +73,8 @@ def main():
     # ioex mining node stats
     node_state = getNodeState(session, 30336)
     height = node_state["Height"]
-    with open("/data/elastos/metrics/prometheus/node-exporter/ioex-metrics.prom", "a") as out:
-        out.write(f'ioex_metrics_nodestate{{chain="ioexmain",height="{height}"}} 1\n')
+    with open("/data/elastos/metrics/prometheus/node-exporter/ioex-metrics.prom", "w") as out:
+        out.write(f'ioex_metrics_nodestate{{chain="ioex",height="{height}"}} 1\n')
 
 def getProducerInfo(session, rpcport, rpcuser, rpcpassword, nodekey):
     producer = {}
