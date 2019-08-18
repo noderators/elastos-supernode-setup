@@ -24,7 +24,7 @@ def main():
     node_version = node_state["compile"]
     services = node_state["services"]
     with open("/data/elastos/metrics/prometheus/node-exporter/elastos-metrics.prom", "w") as out:
-        out.write(f'elastos_metrics_nodestate{{chain="main",height="{height}",nodeversion="{node_version}",services="{services}"}} 1\n')
+        out.write(f'elastos_metrics_nodestate{{chain="main",nodeversion="{node_version}",services="{services}"}} {height}\n')
 
     # DPoS Node Info
     nodekey = getNodeKeyFromKeystoreFile()
@@ -45,12 +45,12 @@ def main():
     producer_illegalheight = producer["illegalheight"]
     producer_rank = producer["index"] + 1
     with open("/data/elastos/metrics/prometheus/node-exporter/elastos-metrics.prom", "a") as out:
-        out.write(f'elastos_metrics_dpos_rank{{height="{height}",nickname="{producer_nickname}",ownerpublickey="{producer_ownerpublickey}",nodepublickey="{producer_nodepublickey}"}} {producer_rank}\n')
-        out.write(f'elastos_metrics_dpos_state{{height="{height}",nickname="{producer_nickname}",ownerpublickey="{producer_ownerpublickey}",nodepublickey="{producer_nodepublickey}",state="{producer_state_raw}"}} {producer_state}\n')
-        out.write(f'elastos_metrics_dpos_registerheight{{height="{height}",nickname="{producer_nickname}",ownerpublickey="{producer_ownerpublickey}",nodepublickey="{producer_nodepublickey}"}} {producer_registerheight}\n')
-        out.write(f'elastos_metrics_dpos_cancelheight{{height="{height}",nickname="{producer_nickname}",ownerpublickey="{producer_ownerpublickey}",nodepublickey="{producer_nodepublickey}"}} {producer_cancelheight}\n')
-        out.write(f'elastos_metrics_dpos_inactiveheight{{height="{height}",nickname="{producer_nickname}",ownerpublickey="{producer_ownerpublickey}",nodepublickey="{producer_nodepublickey}"}} {producer_inactiveheight}\n')
-        out.write(f'elastos_metrics_dpos_illegalheight{{height="{height}",nickname="{producer_nickname}",ownerpublickey="{producer_ownerpublickey}",nodepublickey="{producer_nodepublickey}"}} {producer_illegalheight}\n')
+        out.write(f'elastos_metrics_dpos_rank{{nickname="{producer_nickname}",ownerpublickey="{producer_ownerpublickey}",nodepublickey="{producer_nodepublickey}"}} {producer_rank}\n')
+        out.write(f'elastos_metrics_dpos_state{{nickname="{producer_nickname}",ownerpublickey="{producer_ownerpublickey}",nodepublickey="{producer_nodepublickey}"}} {producer_state}\n')
+        out.write(f'elastos_metrics_dpos_registerheight{{nickname="{producer_nickname}",ownerpublickey="{producer_ownerpublickey}",nodepublickey="{producer_nodepublickey}"}} {producer_registerheight}\n')
+        out.write(f'elastos_metrics_dpos_cancelheight{{nickname="{producer_nickname}",ownerpublickey="{producer_ownerpublickey}",nodepublickey="{producer_nodepublickey}"}} {producer_cancelheight}\n')
+        out.write(f'elastos_metrics_dpos_inactiveheight{{nickname="{producer_nickname}",ownerpublickey="{producer_ownerpublickey}",nodepublickey="{producer_nodepublickey}"}} {producer_inactiveheight}\n')
+        out.write(f'elastos_metrics_dpos_illegalheight{{nickname="{producer_nickname}",ownerpublickey="{producer_ownerpublickey}",nodepublickey="{producer_nodepublickey}"}} {producer_illegalheight}\n')
 
     # DID Sidechain Node State
     rpcport, rpcuser, rpcpassword = getConfigs("/data/elastos/did/config.json", chain="did")
@@ -59,7 +59,7 @@ def main():
     node_version = node_state["compile"]
     services = node_state["services"]
     with open("/data/elastos/metrics/prometheus/node-exporter/elastos-metrics.prom", "a") as out:
-        out.write(f'elastos_metrics_nodestate{{chain="did",height="{height}",nodeversion="{node_version}",services="{services}"}} 1\n')
+        out.write(f'elastos_metrics_nodestate{{chain="did",nodeversion="{node_version}",services="{services}"}} {height}\n')
 
     # Token Sidechain Node State 
     rpcport, rpcuser, rpcpassword = getConfigs("/data/elastos/token/config.json", chain="token")
@@ -68,13 +68,13 @@ def main():
     node_version = node_state["compile"]
     services = node_state["services"]
     with open("/data/elastos/metrics/prometheus/node-exporter/elastos-metrics.prom", "a") as out:
-        out.write(f'elastos_metrics_nodestate{{chain="token",height="{height}",nodeversion="{node_version}",services="{services}"}} 1\n')
+        out.write(f'elastos_metrics_nodestate{{chain="token",nodeversion="{node_version}",services="{services}"}} {height}\n')
 
     # ioex mining node stats
     node_state = getNodeState(session, 30336)
     height = node_state["Height"]
     with open("/data/elastos/metrics/prometheus/node-exporter/ioex-metrics.prom", "w") as out:
-        out.write(f'ioex_metrics_nodestate{{chain="ioex",height="{height}"}} 1\n')
+        out.write(f'ioex_metrics_nodestate{{chain="ioex"}} {height}\n')
 
 def getProducerInfo(session, rpcport, rpcuser, rpcpassword, nodekey):
     producer = {}

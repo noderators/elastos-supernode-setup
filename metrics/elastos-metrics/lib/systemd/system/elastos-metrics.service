@@ -18,11 +18,8 @@ ExecStart=/usr/local/bin/elastos-shell2http                                     
                     (.name | contains(\"ioex\")) or                             \
                     (.name | contains(\"node_cpu\")) or                         \
                     (.name | contains(\"node_disk\")) or                        \
-                    (.name | contains(\"node_filesystem_size\")) or             \
-                    (.name | contains(\"node_filesystem_free\")) or             \
-                    (.name | contains(\"node_load15\")) or                      \
-                    (.name | contains(\"node_memory_MemTotal\")) or             \
-                    (.name | contains(\"node_memory_MemAvailable\")) or         \
+                    (.name | contains(\"node_filesystem\")) or                  \
+                    (.name | contains(\"node_memory\")) or                      \
                     (.name | contains(\"node_systemd_unit_state\")) or          \
                     (.name | contains(\"node_uname_info\"))                     \
                 )]'"

@@ -10,8 +10,9 @@ global:
 
 # Load and evaluate rules in this file every 'evaluation_interval' seconds.
 rule_files:
-  # - "first.rules"
-  # - "second.rules"
+  - "elastos.rules.yml"
+  - "ioex.rules.yml"
+  - "system.rules.yml"
 
 # A scrape configuration containing exactly one endpoint to scrape:
 # Here it's Prometheus itself.
@@ -19,7 +20,7 @@ scrape_configs:
   # The job name is added as a label `job=<job_name>` to any timeseries scraped from this config.
   - job_name: 'prometheus'
 
-    # Override the global default and scrape targets from this job every 5 seconds.
+    # Override the global default and scrape targets from this job every 30 seconds.
     scrape_interval: 30s
     scrape_timeout: 10s
 
@@ -36,5 +37,12 @@ scrape_configs:
       - targets: ['localhost:9100']
     metric_relabel_configs:
       - source_labels: [__name__]
-        regex: .*(cpu|disk_bytes|filesystem_free|filesystem_size|load5|memory_MemFree|memory_MemTotal|uname_info).*
+        regex: .*(elastos|ioex|node_cpu|node_disk|node_filesystem|node_memory|node_systemd_unit_state|node_uname_info).*
         action: keep
+
+alerting:
+  alertmanagers:
+    - static_configs:
+      - targets:
+        - localhost:9093
+

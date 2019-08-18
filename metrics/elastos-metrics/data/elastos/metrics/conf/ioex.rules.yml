@@ -1,0 +1,12 @@
+groups:
+- name: IoexRules
+  rules:
+  # Height hasn't been growing for a while
+  - alert: HeightNotGrowing
+    expr: (idelta(ioex_metrics_nodestate{chain="ioex"}[5m])) == 0
+    for: 1h
+    labels:
+      severity: critical
+    annotations:
+      summary: "Elastos Blockchain not growing (instance {{ $labels.instance }}, chain {{ $labels.chain }})"
+      description: "Height has not been growing for a while\n  LABELS: {{ $labels }}"
