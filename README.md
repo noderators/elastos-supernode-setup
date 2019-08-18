@@ -69,7 +69,7 @@
 6. Update /data/elastos/carrier/bootstrap.conf
     - Change "external_ip" to your own public IP address. Make sure to remove the 2 backslashes "//" from the line too
 
-7. Update /etc/elastos-metrics/params_supernode.env
+7. Update /etc/elastos-metrics/params.env
     - Change "PORT", "AUTH_USER" and "AUTH_PASSWORD" to your own choosing
 
 8. Now, start up your services
