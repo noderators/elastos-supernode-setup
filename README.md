@@ -76,8 +76,18 @@
     - Change "PayToAddr" to your own ioeX wallet address
     - Change "MinerInfo" to your own miner name(You can set any name you want)
 
-9. Install postfix on your server if you want to be alerted via email
-    - Instructions available at [https://hostadvice.com/how-to/how-to-setup-postfix-as-send-only-mail-server-on-an-ubuntu-18-04-dedicated-server-or-vps/](https://hostadvice.com/how-to/how-to-setup-postfix-as-send-only-mail-server-on-an-ubuntu-18-04-dedicated-server-or-vps/)
+9. Set up a smtp server
+    - Option 1: You can install postfix by following the directions at [https://hostadvice.com/how-to/how-to-setup-postfix-as-send-only-mail-server-on-an-ubuntu-18-04-dedicated-server-or-vps/](https://hostadvice.com/how-to/how-to-setup-postfix-as-send-only-mail-server-on-an-ubuntu-18-04-dedicated-server-or-vps/)
+    - Option 2: If you're using AWS, you can use AWS SES service to set up a SMTP server for free
+        1. Follow the directions at [https://docs.aws.amazon.com/ses/latest/DeveloperGuide/verify-email-addresses.html](https://docs.aws.amazon.com/ses/latest/DeveloperGuide/verify-email-addresses.html) to first verify your email
+        2. Go to [https://console.aws.amazon.com/ses/](https://console.aws.amazon.com/ses/)
+        3. In the navigation pane on the left side of the Amazon SES console, under **Identity Management**, choose **Email Addresses** to view the email address that you verified from step 1
+        4. In the list of identities, check the box next to email address that you have verified
+        5. Choose **Send a Test Email** to send a test email so you know it works correctly
+        6. In the navigation pane, choose **SMTP Settings**
+        7. In the content pane, choose **Create My SMTP Credentials**
+        8. For **Create User for SMTP**, type a name for your SMTP user. Alternatively, you can use the default value that is provided in this field. When you finish, choose **Create**
+        9. Choose **Show User SMTP Credentials**. Your SMTP credentials are shown on the screen. Copy these credentials and store them in a safe place. You can also choose **Download Credentials** to download a file that contains your credentials.
     - Update /data/elastos/metrics/conf/alertmanager.yml and change the values for "smtp_smarthost", "smtp_from", "smtp_auth_username" and "smtp_auth_password" to your own setting
 
 10. Now, start up your services
