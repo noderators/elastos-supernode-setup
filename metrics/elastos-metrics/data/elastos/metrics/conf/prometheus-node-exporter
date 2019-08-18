@@ -7,7 +7,7 @@ ARGS='--collector.diskstats.ignored-devices=^(ram|loop|fd|(h|s|v|xv)d[a-z]|nvme\
       --collector.netdev.ignored-devices=^lo$ \
       --collector.textfile.directory=/data/elastos/metrics/prometheus/node-exporter \
       --collector.systemd \
-      --collector.systemd.unit-whitelist="elastos.+" \
+      --collector.systemd.unit-whitelist="(elastos|ioex).+" \
       --no-collector.arp \
       --no-collector.bcache \
       --no-collector.edac \
