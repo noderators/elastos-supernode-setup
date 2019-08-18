@@ -70,6 +70,12 @@ def main():
     with open("/data/elastos/metrics/prometheus/node-exporter/elastos-metrics.prom", "a") as out:
         out.write(f'elastos_metrics_nodestate{{chain="token",height="{height}",nodeversion="{node_version}",services="{services}"}} 1\n')
 
+    # ioex mining node stats
+    node_state = getNodeState(session, 30336)
+    height = node_state["Height"]
+    with open("/data/elastos/metrics/prometheus/node-exporter/ioex-metrics.prom", "a") as out:
+        out.write(f'ioex_metrics_nodestate{{chain="main",height="{height}"}} 1\n')
+
 def getProducerInfo(session, rpcport, rpcuser, rpcpassword, nodekey):
     producer = {}
     url = "http://{0}:{1}".format(HOST, rpcport)
@@ -96,10 +102,13 @@ def getNodeKeyFromKeystoreFile():
     nodekey = keystore_cmd.communicate()[0].decode().replace("-", "", -1).split("\n")[2].split(" ")[1]
     return nodekey
 
-def getNodeState(session, rpcport, rpcuser, rpcpassword):
+def getNodeState(session, rpcport, rpcuser=None, rpcpassword=None):
     url = "http://{0}:{1}".format(HOST, rpcport)
     d = {"method":"getnodestate"}
-    response = session.post(url, data=json.dumps(d), auth=(rpcuser, rpcpassword))
+    if rpcuser and rpcpassword:
+        response = session.post(url, data=json.dumps(d), auth=(rpcuser, rpcpassword))
+    else:
+        response = session.post(url, data=json.dumps(d))
     data = json.loads(response.text)["result"]
     return data
 

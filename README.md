@@ -126,7 +126,8 @@
 - Create a grafana dashboard for your supernode using elastos-metrics package
 
 ## Ioex Mining
-If you want to, you can also use the same supernode server to run an ioeX mining node. This is entirely optional but if you install this, the metrics package from above will automatically start collecting metrics about your ioeX mining node.
+If you want to, you can also use the same supernode server to run an ioeX mining node. This is entirely optional but if you install this, the metrics package from above will automatically start collecting metrics about your ioeX mining node. 
+If you would like to read more about ioeX, visit [https://github.com/ioeXNetwork/ioeX.MainChain/blob/master/Must_Read_Me.pdf](https://github.com/ioeXNetwork/ioeX.MainChain/blob/master/Must_Read_Me.pdf)
 
 ### How to download and install the packages(the easy way)
 1. Go to releases at [https://github.com/noderators/elastos-supernode-setup/releases](https://github.com/noderators/elastos-supernode-setup/releases)
@@ -151,10 +152,13 @@ If you want to, you can also use the same supernode server to run an ioeX mining
 3. Don't forget to open ports 30338 and 30339. This part is required if you're deploying this node on something like AWS as AWS blocks all inbound ports by default. This process may be different depending on which platform you're using to deploy the supernode. For example, if on AWS, you would go to "EC2 > Security Groups > Inbound" and open up ports 30338 and 30339
 
 ### Verify whether the mining node is running
-- `cd /data/ioex/mainchain && ioex-mainchain-cli info --height`
+- `cd /data/ioex/mainchain && ioex-mainchain-cli info --height` or `curl http://localhost:30334/api/v1/block/height | jq .`
+- You can get the full list of REST API endpoints available by visiting [https://github.com/ioeXNetwork/ioeX.MainChain/blob/master/docs/Restful_API.md](https://github.com/ioeXNetwork/ioeX.MainChain/blob/master/docs/Restful_API.md)
 
-### Use cli to check other info
-- `cd /data/ioex/mainchain && ioex-mainchain-cli info --state`
-- `cd /data/ioex/mainchain && ioex-mainchain-cli info --connections`
-- `cd /data/ioex/mainchain && ioex-mainchain-cli info --nbr`
-- `cd /data/ioex/mainchain && ioex-mainchain-cli wallet --balance EXeTCMMCtZTeL9DGmPuEuhSyPuZjfxsnXr`
+### Use cli or RPC port to check other info
+- `cd /data/ioex/mainchain && ioex-mainchain-cli info --state` or `curl -H 'Content-Type: application/json' -H 'Accept:application/json' --data '{"method":"getnodestate"}' http://localhost:30336 | jq .`
+- `cd /data/ioex/mainchain && ioex-mainchain-cli info --connections` or `curl -H 'Content-Type: application/json' -H 'Accept:application/json' --data '{"method":"getconnectioncount"}' http://localhost:30336`
+- `cd /data/ioex/mainchain && ioex-mainchain-cli info --nbr` or `curl -H 'Content-Type: application/json' -H 'Accept:application/json' --data '{"method":"getneighbors"}' http://localhost:30336 | jq .`
+- `cd /data/ioex/mainchain && ioex-mainchain-cli wallet --balance EXeTCMMCtZTeL9DGmPuEuhSyPuZjfxsnXr` or `curl -H 'Content-Type: application/json' -H 'Accept:application/json' --data '{"method":"getreceivedbyaddress", "params": {"address": "EXeTCMMCtZTeL9DGmPuEuhSyPuZjfxsnXr"}}' http://localhost:30336 | jq .`
+- You can get the full list of RPC API endpoints available by visiting [https://github.com/ioeXNetwork/ioeX.MainChain/blob/master/docs/jsonrpc_apis.md](https://github.com/ioeXNetwork/ioeX.MainChain/blob/master/docs/jsonrpc_apis.md)
+
