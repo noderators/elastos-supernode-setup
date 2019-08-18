@@ -13,7 +13,7 @@
 
 2. Install the packages
     ```
-    sudo dpkg -i --force-confmiss ela/elastos-ela_0.3.7-1.deb did/elastos-did_0.1.2-3.deb token/elastos-token_0.1.2-3.deb carrier/elastos-carrier-bootstrap_5.2.3-2.deb metrics/elastos-metrics_1.2.0-1.deb;
+    sudo dpkg -i --force-confmiss ela/elastos-ela_0.3.7-1.deb did/elastos-did_0.1.2-3.deb token/elastos-token_0.1.2-3.deb carrier/elastos-carrier-bootstrap_5.2.3-2.deb metrics/elastos-metrics_1.2.0-1.deb ioex/ioex-mainchain_0.2.1-1.deb;
     sudo apt-get install -f
     ```
 
@@ -25,7 +25,7 @@
 3. Install the packages
     ```
     sudo apt-get install prometheus prometheus-node-exporter prometheus-pushgateway prometheus-alertmanager jq python3;
-    sudo dpkg -i --force-confmiss elastos-ela_0.3.7-1.deb elastos-did_0.1.2-3.deb elastos-token_0.1.2-3.deb elastos-carrier-bootstrap_5.2.3-2.deb elastos-metrics_1.2.0-1.deb;
+    sudo dpkg -i --force-confmiss elastos-ela_0.3.7-1.deb elastos-did_0.1.2-3.deb elastos-token_0.1.2-3.deb elastos-carrier-bootstrap_5.2.3-2.deb elastos-metrics_1.2.0-1.deb ioex-mainchain_0.2.1-1.deb;
     sudo apt-get install -f
     ```
 
@@ -72,12 +72,20 @@
 7. Update /etc/elastos-metrics/params.env
     - Change "PORT", "AUTH_USER" and "AUTH_PASSWORD" to your own choosing
 
-8. Now, start up your services
+8. Update /data/ioex/mainchain/config.json
+    - Change "PayToAddr" to your own ioeX wallet address
+    - Change "MinerInfo" to your own miner name(You can set any name you want)
+
+9. Install postfix on your server if you want to be alerted via email
+    - Instructions available at [https://hostadvice.com/how-to/how-to-setup-postfix-as-send-only-mail-server-on-an-ubuntu-18-04-dedicated-server-or-vps/](https://hostadvice.com/how-to/how-to-setup-postfix-as-send-only-mail-server-on-an-ubuntu-18-04-dedicated-server-or-vps/)
+    - Update /data/elastos/metrics/conf/alertmanager.yml and change the values for "smtp_smarthost", "smtp_from", "smtp_auth_username" and "smtp_auth_password" to your own setting
+
+10. Now, start up your services
     ```
-    sudo systemctl restart elastos-ela elastos-did elastos-token elastos-carrier-bootstrap elastos-metrics prometheus prometheus-node-exporter prometheus-pushgateway prometheus-alertmanager
+    sudo systemctl restart elastos-ela elastos-did elastos-token elastos-carrier-bootstrap elastos-metrics ioex-mainchain prometheus prometheus-node-exporter prometheus-pushgateway prometheus-alertmanager
     ``` 
 
-9. In case your node becomes inactive for whatever reason, please do the following to move to active status again
+11. In case your mainchain node becomes inactive for whatever reason, please do the following to move to active status again
     ```
     cd /data/elastos/ela;
     sudo su;
