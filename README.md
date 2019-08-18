@@ -129,16 +129,22 @@
 If you want to, you can also use the same supernode server to run an ioeX mining node. This is entirely optional but if you install this, the metrics package from above will automatically start collecting metrics about your ioeX mining node. 
 If you would like to read more about ioeX, visit [https://github.com/ioeXNetwork/ioeX.MainChain/blob/master/Must_Read_Me.pdf](https://github.com/ioeXNetwork/ioeX.MainChain/blob/master/Must_Read_Me.pdf)
 
-### How to download and install the packages(the easy way)
+### How to download and install the packages
 1. Go to releases at [https://github.com/noderators/elastos-supernode-setup/releases](https://github.com/noderators/elastos-supernode-setup/releases)
 
 2. Download the deb package for ioex-mainchain
 
-3. Install the package
+3. Install the ioex-mainchain package
     ```
     sudo dpkg -i --force-confmiss ioex-mainchain_0.2.1-1.deb;
     sudo apt-get install -f
     ```
+
+4. Install the metrics package(OPTIONAL)
+- This part is entirely optional and you can get by even if you don't install this package 
+- If you decide to install the metrics package, you can get access to a lot of additional features such as metrics, alerting via email, alerting via SMS(in the future)
+- You can download the metrics package from the same release page at [https://github.com/noderators/elastos-supernode-setup/releases](https://github.com/noderators/elastos-supernode-setup/releases)
+- Go to the top of this documentation to read up on how to configure the metrics package properly
 
 ### Change configs
 1. Update /data/ioex/mainchain/config.json
