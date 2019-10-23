@@ -38,7 +38,7 @@ build_deb_package token elastos-token 0.1.2-3
 
 build_deb_package carrier elastos-carrier-bootstrap 5.2.3-2
 
-build_deb_package metrics elastos-metrics 1.2.0-1
+build_deb_package metrics elastos-metrics 1.2.0-2
 
 build_deb_package ioex ioex-mainchain 0.2.1-1
 

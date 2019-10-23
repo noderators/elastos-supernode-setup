@@ -13,7 +13,7 @@
 
 2. Install the packages
     ```
-    sudo dpkg -i --force-confmiss ela/elastos-ela_0.3.7-1.deb did/elastos-did_0.1.2-3.deb token/elastos-token_0.1.2-3.deb carrier/elastos-carrier-bootstrap_5.2.3-2.deb metrics/elastos-metrics_1.2.0-1.deb ioex/ioex-mainchain_0.2.1-1.deb;
+    sudo dpkg -i --force-confmiss ela/elastos-ela_0.3.7-1.deb did/elastos-did_0.1.2-3.deb token/elastos-token_0.1.2-3.deb carrier/elastos-carrier-bootstrap_5.2.3-2.deb metrics/elastos-metrics_1.2.0-2.deb ioex/ioex-mainchain_0.2.1-1.deb;
     sudo apt-get install -f
     ```
 
@@ -25,7 +25,7 @@
 3. Install the packages
     ```
     sudo apt-get install prometheus prometheus-node-exporter prometheus-pushgateway prometheus-alertmanager jq python3;
-    sudo dpkg -i --force-confmiss elastos-ela_0.3.7-1.deb elastos-did_0.1.2-3.deb elastos-token_0.1.2-3.deb elastos-carrier-bootstrap_5.2.3-2.deb elastos-metrics_1.2.0-1.deb ioex-mainchain_0.2.1-1.deb;
+    sudo dpkg -i --force-confmiss elastos-ela_0.3.7-1.deb elastos-did_0.1.2-3.deb elastos-token_0.1.2-3.deb elastos-carrier-bootstrap_5.2.3-2.deb elastos-metrics_1.2.0-2.deb ioex-mainchain_0.2.1-1.deb;
     sudo apt-get install -f
     ```
 
@@ -72,11 +72,22 @@
 7. Update /etc/elastos-metrics/params.env
     - Change "PORT", "AUTH_USER" and "AUTH_PASSWORD" to your own choosing
 
-8. Update /data/ioex/mainchain/config.json
+8. Update /data/elastos/metrics/conf/prometheus.yml
+    - Right above the line with "metric_relabel_configs:", add the following:
+        ```
+        relabel_configs:
+          - source_labels: [__address__]
+            regex:  '.*'
+            target_label: instance
+            replacement: '$YOURNODENAME:9100'
+        ```
+        Make sure to replace $YOURNODENAME with your own supernode name. Every time email is sent, it'll have this label. This comes in handy if you're running multiple supernodes
+
+9. Update /data/ioex/mainchain/config.json
     - Change "PayToAddr" to your own ioeX wallet address
     - Change "MinerInfo" to your own miner name(You can set any name you want)
 
-9. Set up a smtp server
+10. Set up an smtp server
     - Option 1: You can install postfix by following the directions at [https://hostadvice.com/how-to/how-to-setup-postfix-as-send-only-mail-server-on-an-ubuntu-18-04-dedicated-server-or-vps/](https://hostadvice.com/how-to/how-to-setup-postfix-as-send-only-mail-server-on-an-ubuntu-18-04-dedicated-server-or-vps/)
     - Option 2: If you're using AWS, you can use AWS SES service to set up a SMTP server for free
         1. Follow the directions at [https://docs.aws.amazon.com/ses/latest/DeveloperGuide/verify-email-addresses.html](https://docs.aws.amazon.com/ses/latest/DeveloperGuide/verify-email-addresses.html) to first verify your email
@@ -90,12 +101,12 @@
         9. Choose **Show User SMTP Credentials**. Your SMTP credentials are shown on the screen. Copy these credentials and store them in a safe place. You can also choose **Download Credentials** to download a file that contains your credentials.
     - Update /data/elastos/metrics/conf/alertmanager.yml and change the values for "smtp_smarthost", "smtp_from", "smtp_auth_username" and "smtp_auth_password" to your own setting
 
-10. Now, start up your services
+11. Now, start up your services
     ```
     sudo systemctl restart elastos-ela elastos-did elastos-token elastos-carrier-bootstrap elastos-metrics ioex-mainchain prometheus prometheus-node-exporter prometheus-pushgateway prometheus-alertmanager
     ``` 
 
-11. In case your mainchain node becomes inactive for whatever reason, please do the following to move to active status again
+12. In case your mainchain node becomes inactive for whatever reason, please do the following to move to active status again
     ```
     cd /data/elastos/ela;
     sudo su;
