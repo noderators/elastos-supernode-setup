@@ -30,7 +30,7 @@ function build_deb_package() {
     cd $CURR_DIR
 }
 
-build_deb_package ela elastos-ela 0.4.0-1
+build_deb_package ela elastos-ela 0.4.1-1
 
 build_deb_package did elastos-did 0.1.3-1
 
