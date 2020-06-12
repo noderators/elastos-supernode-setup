@@ -13,7 +13,7 @@
 
 2. Install the packages
     ```
-    sudo dpkg -i --force-confmiss ela/elastos-ela_0.5.0-1.deb did/elastos-did_0.1.5-1.deb token/elastos-token_0.1.2-3.deb carrier/elastos-carrier-bootstrap_5.2.3-2.deb metrics/elastos-metrics_1.2.0-2.deb ioex/ioex-mainchain_0.2.1-1.deb;
+    sudo dpkg -i --force-confmiss ela/elastos-ela_0.5.0-1.deb did/elastos-did_0.1.5-1.deb token/elastos-token_0.1.2-3.deb carrier/elastos-carrier-bootstrap_5.2.3-2.deb metrics/elastos-metrics_1.2.0-2.deb;
     sudo apt-get install -f
     ```
 
@@ -25,7 +25,7 @@
 3. Install the packages
     ```
     sudo apt-get install prometheus prometheus-node-exporter prometheus-pushgateway prometheus-alertmanager jq python3;
-    sudo dpkg -i --force-confmiss elastos-ela_0.5.0-1.deb elastos-did_0.1.5-1.deb elastos-token_0.1.2-3.deb elastos-carrier-bootstrap_5.2.3-2.deb elastos-metrics_1.2.0-2.deb ioex-mainchain_0.2.1-1.deb;
+    sudo dpkg -i --force-confmiss elastos-ela_0.5.0-1.deb elastos-did_0.1.5-1.deb elastos-token_0.1.2-3.deb elastos-carrier-bootstrap_5.2.3-2.deb elastos-metrics_1.2.0-2.deb;
     sudo apt-get install -f
     ```
 
@@ -83,11 +83,7 @@
         ```
         Make sure to replace $YOURNODENAME with your own supernode name. Every time email is sent, it'll have this label. This comes in handy if you're running multiple supernodes
 
-9. Update /data/ioex/mainchain/config.json
-    - Change "PayToAddr" to your own ioeX wallet address
-    - Change "MinerInfo" to your own miner name(You can set any name you want)
-
-10. Set up an smtp server
+9. Set up an smtp server
     - Option 1: You can install postfix by following the directions at [https://hostadvice.com/how-to/how-to-setup-postfix-as-send-only-mail-server-on-an-ubuntu-18-04-dedicated-server-or-vps/](https://hostadvice.com/how-to/how-to-setup-postfix-as-send-only-mail-server-on-an-ubuntu-18-04-dedicated-server-or-vps/)
     - Option 2: If you're using AWS, you can use AWS SES service to set up a SMTP server for free
         1. Follow the directions at [https://docs.aws.amazon.com/ses/latest/DeveloperGuide/verify-email-addresses.html](https://docs.aws.amazon.com/ses/latest/DeveloperGuide/verify-email-addresses.html) to first verify your email
@@ -101,12 +97,12 @@
         9. Choose **Show User SMTP Credentials**. Your SMTP credentials are shown on the screen. Copy these credentials and store them in a safe place. You can also choose **Download Credentials** to download a file that contains your credentials.
     - Update /data/elastos/metrics/conf/alertmanager.yml and change the values for "smtp_smarthost", "smtp_from", "smtp_auth_username" and "smtp_auth_password" to your own setting
 
-11. Now, start up your services
+10. Now, start up your services
     ```
-    sudo systemctl restart elastos-ela elastos-did elastos-token elastos-carrier-bootstrap elastos-metrics ioex-mainchain prometheus prometheus-node-exporter prometheus-pushgateway prometheus-alertmanager
+    sudo systemctl restart elastos-ela elastos-did elastos-token elastos-carrier-bootstrap elastos-metrics prometheus prometheus-node-exporter prometheus-pushgateway prometheus-alertmanager
     ``` 
 
-12. In case your mainchain node becomes inactive for whatever reason, please do the following to move to active status again
+11. In case your mainchain node becomes inactive for whatever reason, please do the following to move to active status again
     ```
     cd /data/elastos/ela;
     sudo su;
@@ -150,50 +146,6 @@
     Should return the current onduty supernode(arbiter) and the next list of supernodes in queue to submit block proposals every block(~2 minutes)
 
 ## Roadmap for this repository
-- Update the deb packages so if the node goes down, it alerts via SMS or email
 - Support redhat/centos machines by putting out rpm packages in addition to deb packages
 - Create a grafana dashboard for your supernode using elastos-metrics package
-
-## Ioex Mining
-If you want to, you can also use the same supernode server to run an ioeX mining node. This is entirely optional but if you install this, the metrics package from above will automatically start collecting metrics about your ioeX mining node. 
-If you would like to read more about ioeX, visit [https://github.com/ioeXNetwork/ioeX.MainChain/blob/master/Must_Read_Me.pdf](https://github.com/ioeXNetwork/ioeX.MainChain/blob/master/Must_Read_Me.pdf)
-
-### How to download and install the packages
-1. Go to releases at [https://github.com/noderators/elastos-supernode-setup/releases](https://github.com/noderators/elastos-supernode-setup/releases)
-
-2. Download the deb package for ioex-mainchain
-
-3. Install the ioex-mainchain package
-    ```
-    sudo dpkg -i --force-confmiss ioex-mainchain_0.2.1-1.deb;
-    sudo apt-get install -f
-    ```
-
-4. Install the metrics package(OPTIONAL)
-- This part is entirely optional and you can get by even if you don't install this package 
-- If you decide to install the metrics package, you can get access to a lot of additional features such as metrics, alerting via email, alerting via SMS(in the future)
-- You can download the metrics package from the same release page at [https://github.com/noderators/elastos-supernode-setup/releases](https://github.com/noderators/elastos-supernode-setup/releases)
-- Go to the top of this documentation to read up on how to configure the metrics package properly
-
-### Change configs
-1. Update /data/ioex/mainchain/config.json
-    - Change "PayToAddr" to your own ioeX wallet address
-    - Change "MinerInfo" to your own miner name(You can set any name you want)
-
-2. Now, start up your ioeX mining service
-    ```
-    sudo systemctl restart ioex-mainchain
-    ``` 
-3. Don't forget to open ports 30338 and 30339. This part is required if you're deploying this node on something like AWS as AWS blocks all inbound ports by default. This process may be different depending on which platform you're using to deploy the supernode. For example, if on AWS, you would go to "EC2 > Security Groups > Inbound" and open up ports 30338 and 30339
-
-### Verify whether the mining node is running
-- `cd /data/ioex/mainchain && ioex-mainchain-cli info --height` or `curl http://localhost:30334/api/v1/block/height | jq .`
-- You can get the full list of REST API endpoints available by visiting [https://github.com/ioeXNetwork/ioeX.MainChain/blob/master/docs/Restful_API.md](https://github.com/ioeXNetwork/ioeX.MainChain/blob/master/docs/Restful_API.md)
-
-### Use cli or RPC port to check other info
-- `cd /data/ioex/mainchain && ioex-mainchain-cli info --state` or `curl -H 'Content-Type: application/json' -H 'Accept:application/json' --data '{"method":"getnodestate"}' http://localhost:30336 | jq .`
-- `cd /data/ioex/mainchain && ioex-mainchain-cli info --connections` or `curl -H 'Content-Type: application/json' -H 'Accept:application/json' --data '{"method":"getconnectioncount"}' http://localhost:30336`
-- `cd /data/ioex/mainchain && ioex-mainchain-cli info --nbr` or `curl -H 'Content-Type: application/json' -H 'Accept:application/json' --data '{"method":"getneighbors"}' http://localhost:30336 | jq .`
-- `cd /data/ioex/mainchain && ioex-mainchain-cli wallet --balance EXeTCMMCtZTeL9DGmPuEuhSyPuZjfxsnXr` or `curl -H 'Content-Type: application/json' -H 'Accept:application/json' --data '{"method":"getreceivedbyaddress", "params": {"address": "EXeTCMMCtZTeL9DGmPuEuhSyPuZjfxsnXr"}}' http://localhost:30336 | jq .`
-- You can get the full list of RPC API endpoints available by visiting [https://github.com/ioeXNetwork/ioeX.MainChain/blob/master/docs/jsonrpc_apis.md](https://github.com/ioeXNetwork/ioeX.MainChain/blob/master/docs/jsonrpc_apis.md)
 
