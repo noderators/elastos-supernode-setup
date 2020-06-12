@@ -1,6 +1,6 @@
 Package: elastos-did
 Source: noderators
-Version: 0.1.4-1
+Version: 0.1.5-1
 Architecture: amd64
 Maintainer: Kiran Pachhai <kiran.pachhai@gmail.com>
 Pre-Depends: adduser
