@@ -1,6 +1,6 @@
 Package: elastos-ela
 Source: noderators
-Version: 0.5.0-1
+Version: 0.5.1-1
 Architecture: amd64
 Maintainer: Kiran Pachhai <kiran.pachhai@gmail.com>
 Pre-Depends: adduser

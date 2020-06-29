@@ -30,7 +30,7 @@ function build_deb_package() {
     cd $CURR_DIR
 }
 
-build_deb_package ela elastos-ela 0.5.0-1
+build_deb_package ela elastos-ela 0.5.1-1
 
 build_deb_package did elastos-did 0.1.5-1
 
@@ -39,8 +39,6 @@ build_deb_package token elastos-token 0.1.2-3
 build_deb_package carrier elastos-carrier-bootstrap 5.2.3-2
 
 build_deb_package metrics elastos-metrics 1.2.0-2
-
-build_deb_package ioex ioex-mainchain 0.2.1-1
 
 cd $CURR_DIR
 
