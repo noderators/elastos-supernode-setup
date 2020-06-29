@@ -70,12 +70,6 @@ def main():
     with open("/data/elastos/metrics/prometheus/node-exporter/elastos-metrics.prom", "a") as out:
         out.write(f'elastos_metrics_nodestate{{chain="token",nodeversion="{node_version}",services="{services}"}} {height}\n')
 
-    # ioex mining node stats
-    node_state = getNodeState(session, 30336)
-    height = node_state["Height"]
-    with open("/data/elastos/metrics/prometheus/node-exporter/ioex-metrics.prom", "w") as out:
-        out.write(f'ioex_metrics_nodestate{{chain="ioex"}} {height}\n')
-
 def getProducerInfo(session, rpcport, rpcuser, rpcpassword, nodekey):
     producer = {}
     url = "http://{0}:{1}".format(HOST, rpcport)

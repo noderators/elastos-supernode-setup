@@ -11,7 +11,6 @@ global:
 # Load and evaluate rules in this file every 'evaluation_interval' seconds.
 rule_files:
   - "elastos.rules.yml"
-  - "ioex.rules.yml"
   - "system.rules.yml"
 
 # A scrape configuration containing exactly one endpoint to scrape:
@@ -37,7 +36,7 @@ scrape_configs:
       - targets: ['localhost:9100']
     metric_relabel_configs:
       - source_labels: [__name__]
-        regex: .*(elastos|ioex|node_cpu|node_disk|node_filesystem|node_memory|node_systemd_unit_state|node_uname_info).*
+        regex: .*(elastos|node_cpu|node_disk|node_filesystem|node_memory|node_systemd_unit_state|node_uname_info).*
         action: keep
 
 alerting:
