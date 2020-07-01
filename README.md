@@ -3,6 +3,7 @@
 
 ## Pre-requisites for building the packages yourself
 - Docker(if you want to build the .deb packages)
+- If you're using AWS, make sure to mount /data properly: [https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ebs-using-volumes.html](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ebs-using-volumes.html)
 
 ## How to build and install everything yourself(the hard way)
 1. Build the .deb packages on your ubuntu machine
