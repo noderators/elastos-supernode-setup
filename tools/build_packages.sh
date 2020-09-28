@@ -32,7 +32,7 @@ function build_deb_package() {
 
 build_deb_package ela elastos-ela 0.5.1-1
 
-build_deb_package did elastos-did 0.1.5-1
+build_deb_package did elastos-did 0.2.0-1
 
 build_deb_package token elastos-token 0.1.2-3
 
