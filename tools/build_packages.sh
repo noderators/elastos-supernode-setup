@@ -38,7 +38,7 @@ build_deb_package token elastos-token 0.1.2-3
 
 build_deb_package carrier elastos-carrier-bootstrap 5.2.3-2
 
-build_deb_package metrics elastos-metrics 1.3.1-1
+build_deb_package metrics elastos-metrics 1.3.2-1
 
 cd $CURR_DIR
 

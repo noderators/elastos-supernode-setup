@@ -1,17 +1,23 @@
 # Set the command-line arguments to pass to the server.
-ARGS='-persistence.file="/data/elastos/metrics/prometheus/pushgateway.data" -web.listen-address=":9091"'
+ARGS='--persistence.file="/data/elastos/metrics/prometheus/pushgateway.data" --web.listen-address=":9091"'
 
-# Prometheus-pushgateway supports the following options:
-#  -log.level=info: Only log messages with the given severity or above. Valid
-#   levels: [debug, info, warn, error, fatal, panic].
-#  -persistence.file="": File to persist metrics. If empty, metrics are only
-#   kept in memory.
-#  -persistence.interval=5m0s: The minimum interval at which to write out the
-#   persistence file.
-#  -required-labels="instance": Comma-separated list of label names that will
-#   be attached to pushed metric (with an empty label value) if missing.
-#  -web.listen-address=":9091": Address to listen on for the web interface,
-#   API, and telemetry.
-#  -web.local-assets="/usr/share/prometheus/pushgateway": Path to static
-#   assets/templates directory.
-#  -web.telemetry-path="/metrics": Path under which to expose metrics.
+# Flags:
+#   -h, --help                     Show context-sensitive help (also try --help-long and --help-man).
+#       --web.listen-address=":9091"  
+#                                  Address to listen on for the web interface, API, and telemetry.
+#       --web.local-assets="/usr/share/prometheus/pushgateway"  
+#                                  Path to static assets/templates directory.
+#       --web.telemetry-path="/metrics"  
+#                                  Path under which to expose metrics.
+#       --web.external-url=        The URL under which the Pushgateway is externally reachable.
+#       --web.route-prefix=""      Prefix for the internal routes of web endpoints. Defaults to the
+#                                  path of --web.external-url.
+#       --web.enable-lifecycle     Enable shutdown via HTTP request.
+#       --web.enable-admin-api     Enable API endpoints for admin control actions.
+#       --persistence.file="/var/lib/prometheus/pushgateway.data"  
+#                                  File to persist metrics. If empty, metrics are only kept in memory.
+#       --persistence.interval=5m  The minimum interval at which to write out the persistence file.
+#       --log.level=info           Only log messages with the given severity or above. One of: [debug,
+#                                  info, warn, error]
+#       --log.format=logfmt        Output format of log messages. One of: [logfmt, json]
+#       --version                  Show application version.
