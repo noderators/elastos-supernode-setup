@@ -1,6 +1,5 @@
 # Set the command-line arguments to pass to the server.
-ARGS='-persistence.file="/data/elastos/metrics/prometheus/pushgateway.data" \
-      -web.listen-address=":9091"'
+ARGS='-persistence.file="/data/elastos/metrics/prometheus/pushgateway.data" -web.listen-address=":9091"'
 
 # Prometheus-pushgateway supports the following options:
 #  -log.level=info: Only log messages with the given severity or above. Valid

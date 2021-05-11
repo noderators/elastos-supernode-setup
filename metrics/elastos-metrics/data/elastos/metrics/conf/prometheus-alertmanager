@@ -1,7 +1,5 @@
 # Set the command-line arguments to pass to the server.
-ARGS='-config.file="/data/elastos/metrics/conf/alertmanager.yml" \
-      -storage.path="/data/elastos/metrics/prometheus/alertmanager" \
-      -web.listen-address=":9093"'
+ARGS='-config.file="/data/elastos/metrics/conf/alertmanager.yml" -storage.path="/data/elastos/metrics/prometheus/alertmanager" -web.listen-address=":9093"'
 
 # The alert manager supports the following options:
 #  -config.file string

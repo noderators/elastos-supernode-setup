@@ -2,31 +2,7 @@
 # Due to shell scaping, to pass backslashes for regexes, you need to double
 # them (\\d for \d). If running under systemd, you need to double them again
 # (\\\\d to mean \d), and escape newlines too.
-ARGS='--collector.diskstats.ignored-devices=^(ram|loop|fd|(h|s|v|xv)d[a-z]|nvme\\d+n\\d+p)\\d+$ \
-      --collector.filesystem.ignored-mount-points=^/(sys|proc|dev|run)($|/) \
-      --collector.netdev.ignored-devices=^lo$ \
-      --collector.textfile.directory=/data/elastos/metrics/prometheus/node-exporter \
-      --collector.systemd \
-      --collector.systemd.unit-whitelist="(elastos|ioex).+" \
-      --no-collector.arp \
-      --no-collector.bcache \
-      --no-collector.edac \
-      --no-collector.entropy \
-      --no-collector.filefd \
-      --no-collector.hwmon \
-      --no-collector.infiniband \
-      --no-collector.ipvs \
-      --no-collector.mdadm \
-      --no-collector.netdev \
-      --no-collector.netstat \
-      --no-collector.sockstat \
-      --no-collector.stat \
-      --no-collector.vmstat \
-      --no-collector.wifi \
-      --no-collector.xfs \
-      --no-collector.zfs \
-      --no-collector.timex \
-      --web.listen-address=":9100"'
+ARGS='--collector.diskstats.ignored-devices=^(ram|loop|fd|(h|s|v|xv)d[a-z]|nvme\\d+n\\d+p)\\d+$ --collector.filesystem.ignored-mount-points=^/(sys|proc|dev|run)($|/) --collector.netdev.ignored-devices=^lo$ --collector.textfile.directory=/data/elastos/metrics/prometheus/node-exporter --collector.systemd --collector.systemd.unit-whitelist="(elastos|ioex).+" --no-collector.arp --no-collector.bcache --no-collector.edac --no-collector.entropy --no-collector.filefd --no-collector.hwmon --no-collector.infiniband --no-collector.ipvs --no-collector.mdadm --no-collector.netdev --no-collector.netstat --no-collector.sockstat --no-collector.stat --no-collector.vmstat --no-collector.wifi --no-collector.xfs --no-collector.zfs --no-collector.timex --web.listen-address=":9100"'
 
 # Prometheus-node-exporter supports the following options:
 #
