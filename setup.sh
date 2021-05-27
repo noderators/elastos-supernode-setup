@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
 
+if [[ $(/usr/bin/id -u) -ne 0 ]]; then
+  echo "This script needs to run with sudo priviledges. Please re-run the script as root"
+  exit
+fi
+
 MYTMPDIR="$(mktemp -d)"
 trap 'rm -rf -- "$MYTMPDIR"' EXIT
 cd ${MYTMPDIR}
@@ -7,7 +12,7 @@ cd ${MYTMPDIR}
 RELEASE="v1.24"
 
 echo "Updating the system packages"
-sudo apt-get update -y 
+apt-get update -y 
 echo "Installing dependencies if not installed"
 DEPS=( "wget" "jq" "python3" "prometheus" "prometheus-node-exporter" "prometheus-pushgateway" "prometheus-alertmanager" )
 for dep in "${DEPS[@]}"
@@ -15,7 +20,7 @@ do
   dpkg -s ${dep} >/dev/null 2>&1
   if [ $(echo $?) -ne "0" ]
   then 
-    sudo apt-get install ${dep} -y
+    apt-get install ${dep} -y
   fi
 done
 
@@ -23,11 +28,11 @@ if [ -f /data/elastos/ela/keystore.dat ]
 then
   PREVIOUS_INSTALL="yes"
   # Let's backup these files just in case the user does not want to change any settings with the new release
-  sudo cp /data/elastos/ela/keystore.dat mainchain_keystore.dat
-  sudo cp /data/elastos/ela/config.json mainchain_config.json 
-  sudo cp /data/elastos/arbiter/keystore.dat arbiter_keystore.dat
-  sudo cp /data/elastos/did/config.json did_config.json 
-  sudo cp /etc/elastos-metrics/params.env /data/elastos/metrics/conf/prometheus.yml /data/elastos/metrics/conf/alertmanager.yml .
+  cp /data/elastos/ela/keystore.dat mainchain_keystore.dat
+  cp /data/elastos/ela/config.json mainchain_config.json 
+  cp /data/elastos/arbiter/keystore.dat arbiter_keystore.dat
+  cp /data/elastos/did/config.json did_config.json 
+  cp /etc/elastos-metrics/params.env /data/elastos/metrics/conf/prometheus.yml /data/elastos/metrics/conf/alertmanager.yml .
 fi
 
 echo ""
@@ -43,8 +48,8 @@ do
   if [ $(echo $?) -ne "0" ]
   then 
     echo "Installing ${DEPS[$i]} Version: ${VERSIONS[$i]}"
-    sudo dpkg -i --force-confmiss "${DEPS[$i]}_${VERSIONS[$i]}.deb"
-    sudo apt-get install -f
+    dpkg -i --force-confmiss "${DEPS[$i]}_${VERSIONS[$i]}.deb"
+    apt-get install -f
   else  
     echo "${DEPS[$i]} is already the latest version with Version: ${VERSIONS[$i]}"
   fi
@@ -52,20 +57,20 @@ done
 '''
 
 DEB_DIRECTORY="/home/kpachhai/repos/github.com/noderators/elastos-supernode-setup"
-sudo dpkg -i --force-confmiss ${DEB_DIRECTORY}/ela/elastos-ela_0.7.0-2.deb
-sudo dpkg -i --force-confmiss ${DEB_DIRECTORY}/did/elastos-did_0.2.0-2.deb
-sudo dpkg -i --force-confmiss ${DEB_DIRECTORY}/arbiter/elastos-arbiter_0.2.1-1.deb
-sudo dpkg -i --force-confmiss ${DEB_DIRECTORY}/carrier/elastos-carrier-bootstrap_5.2.3-3.deb
-sudo dpkg -i --force-confmiss ${DEB_DIRECTORY}/metrics/elastos-metrics_1.4.0-1.deb
+dpkg -i --force-confmiss ${DEB_DIRECTORY}/ela/elastos-ela_0.7.0-2.deb
+dpkg -i --force-confmiss ${DEB_DIRECTORY}/did/elastos-did_0.2.0-2.deb
+dpkg -i --force-confmiss ${DEB_DIRECTORY}/arbiter/elastos-arbiter_0.2.1-1.deb
+dpkg -i --force-confmiss ${DEB_DIRECTORY}/carrier/elastos-carrier-bootstrap_5.2.3-3.deb
+dpkg -i --force-confmiss ${DEB_DIRECTORY}/metrics/elastos-metrics_1.4.0-1.deb
 
 if [[ "${PREVIOUS_INSTALL}" != "yes" ]]
 then
   # Let's backup these files just in case the user does not want to change any settings with the new release
-  sudo cp /data/elastos/ela/keystore.dat mainchain_keystore.dat
-  sudo cp /data/elastos/ela/config.json mainchain_config.json 
-  sudo cp mainchain_keystore.dat arbiter_keystore.dat
-  sudo cp /data/elastos/did/config.json did_config.json 
-  sudo cp /etc/elastos-metrics/params.env /data/elastos/metrics/conf/prometheus.yml /data/elastos/metrics/conf/alertmanager.yml .
+  cp /data/elastos/ela/keystore.dat mainchain_keystore.dat
+  cp /data/elastos/ela/config.json mainchain_config.json 
+  cp mainchain_keystore.dat arbiter_keystore.dat
+  cp /data/elastos/did/config.json did_config.json 
+  cp /etc/elastos-metrics/params.env /data/elastos/metrics/conf/prometheus.yml /data/elastos/metrics/conf/alertmanager.yml .
 fi
 
 echo ""
@@ -73,36 +78,36 @@ echo "Personalizing your Elastos Supernode setup"
 read -p "WARNING! You're trying to create a new wallet. This may replace your previous wallet if it exists already. Proceed? [y/N] " answer
 if [[ "${answer}" == "y" ]] || [[ "${answer}" == "Y" ]] || [[ "${answer}" == "yes" ]]
 then 
-  sudo rm -f /data/elastos/ela/keystore.dat 
+  rm -f /data/elastos/ela/keystore.dat 
   read -p "Enter the password for your keystore.dat: " pswd
   echo "Creating a wallet with the given password"
   /usr/local/bin/elastos-ela-cli wallet create -p ${pswd}
-  sudo mv keystore.dat /data/elastos/ela/keystore.dat
-  sudo chown elauser:elauser /data/elastos/ela/keystore.dat 
-  sudo cp /data/elastos/ela/keystore.dat /data/elastos/arbiter/keystore.dat
-  sudo sed -i "s#KEYSTORE_PASSWORD=.*#KEYSTORE_PASSWORD=\"${pswd}\"#g" /etc/elastos-ela/params.env
+  mv keystore.dat /data/elastos/ela/keystore.dat
+  chown elauser:elauser /data/elastos/ela/keystore.dat 
+  cp /data/elastos/ela/keystore.dat /data/elastos/arbiter/keystore.dat
+  sed -i "s#KEYSTORE_PASSWORD=.*#KEYSTORE_PASSWORD=\"${pswd}\"#g" /etc/elastos-ela/params.env
 else 
-  sudo cp mainchain_keystore.dat /data/elastos/ela/keystore.dat
-  sudo cp arbiter_keystore.dat /data/elastos/arbiter/keystore.dat
+  cp mainchain_keystore.dat /data/elastos/ela/keystore.dat
+  cp arbiter_keystore.dat /data/elastos/arbiter/keystore.dat
 fi
-sudo chmod 644 /data/elastos/ela/keystore.dat
+chmod 644 /data/elastos/ela/keystore.dat
 
 echo ""
 echo "Modifying the config file parameters for ELA mainchain node"
-sudo sed -i "s#\"IPAddress\":.*#\"IPAddress\": \"$(curl ifconfig.me)\"#g" /data/elastos/ela/config.json
+cat <<< $(jq ".Configuration.DPoSConfiguration.IPAddress = \"$(curl ifconfig.me)\"" /data/elastos/ela/config.json) > /data/elastos/ela/config.json
 read -p "Would you like to change the current username and password for RPC configuration for this node? [y/N] " answer
 if [[ "${answer}" == "y" ]] || [[ "${answer}" == "Y" ]] || [[ "${answer}" == "yes" ]]
 then
   read -p "Enter the username for RPC configuration: " usr
   read -p "Enter the password for RPC configuration: " pswd
 else 
-  usr=$(cat mainchain_config.json | grep User | sed 's#.*User": ##g' | sed 's#,##g' | sed 's#"##g')
-  pswd=$(cat mainchain_config.json | grep Pass | sed 's#.*Pass": ##g' | sed 's#,##g' | sed 's#"##g')
+  usr=$(cat mainchain_config.json | jq -r ".Configuration.RpcConfiguration.User")
+  pswd=$(cat mainchain_config.json | jq -r ".Configuration.RpcConfiguration.Pass")
 fi
-sudo sed -i "s#\"User\":.*#\"User\": \"${usr}\",#g" /data/elastos/ela/config.json
-sudo sed -i "s#\"Pass\":.*#\"Pass\": \"${pswd}\",#g" /data/elastos/ela/config.json 
-sudo sed -i "s#mainchain_rpc_user#${usr}#g" /data/elastos/arbiter/config.json
-sudo sed -i "s#mainchain_rpc_pass#${pswd}#g" /data/elastos/arbiter/config.json
+cat <<< $(jq ".Configuration.RpcConfiguration.User = \"${usr}\"" /data/elastos/ela/config.json) > /data/elastos/ela/config.json
+cat <<< $(jq ".Configuration.RpcConfiguration.Pass = \"${pswd}\"" /data/elastos/ela/config.json) > /data/elastos/ela/config.json
+cat <<< $(jq ".Configuration.MainNode.Rpc.User = \"${usr}\"" /data/elastos/arbiter/config.json) > /data/elastos/arbiter/config.json
+cat <<< $(jq ".Configuration.MainNode.Rpc.Pass = \"${pswd}\"" /data/elastos/arbiter/config.json) > /data/elastos/arbiter/config.json
 
 echo ""
 echo "Modifying the config file parameters for DID sidechain node"
@@ -112,32 +117,32 @@ then
   read -p "Enter the username for RPC configuration: " usr
   read -p "Enter the password for RPC configuration: " pswd
 else 
-  usr=$(cat did_config.json | grep RPCUser | sed 's#.*RPCUser": ##g' | sed 's#,##g' | sed 's#"##g')
-  pswd=$(cat did_config.json | grep RPCPass | sed 's#.*RPCPass": ##g' | sed 's#,##g' | sed 's#"##g')
+  usr=$(cat did_config.json | jq -r ".RPCUser")
+  pswd=$(cat did_config.json | jq -r ".RPCPass")
 fi
-sudo sed -i "s#\"RPCUser\":.*#\"RPCUser\": \"${usr}\",#g" /data/elastos/did/config.json
-sudo sed -i "s#\"RPCPass\":.*#\"RPCPass\": \"${pswd}\",#g" /data/elastos/did/config.json
-sudo sed -i "s#did_rpc_user#${usr}#g" /data/elastos/arbiter/config.json
-sudo sed -i "s#did_rpc_pass#${pswd}#g" /data/elastos/arbiter/config.json
+cat <<< $(jq ".RPCUser = \"${usr}\"" /data/elastos/did/config.json) > /data/elastos/did/config.json
+cat <<< $(jq ".RPCPass = \"${pswd}\"" /data/elastos/did/config.json) > /data/elastos/did/config.json
+cat <<< $(jq ".Configuration.SideNodeList[0].Rpc.User = \"${usr}\"" /data/elastos/arbiter/config.json) > /data/elastos/arbiter/config.json
+cat <<< $(jq ".Configuration.SideNodeList[0].Rpc.Pass = \"${pswd}\"" /data/elastos/arbiter/config.json) > /data/elastos/arbiter/config.json
 
 pswd=$(cat /etc/elastos-ela/params.env | grep KEYSTORE_PASSWORD | sed 's#.*KEYSTORE_PASSWORD=##g' | sed 's#"##g')
-sudo cp /data/elastos/arbiter/keystore.dat .
-NUM_WALLETS=$(sudo elastos-ela-cli wallet a -p ${pswd} | grep - | wc -l)
+cp /data/elastos/arbiter/keystore.dat .
+NUM_WALLETS=$(elastos-ela-cli wallet a -p ${pswd} | grep - | wc -l)
 NUM_WALLETS=$(expr ${NUM_WALLETS} - 1)
 if [ "${NUM_WALLETS}" -lt "2" ]
 then
   echo ""
   echo "Creating a secondary account for Arbiter node that will be used for did block generation"
-  sudo chown $USER:$USER keystore.dat
+  chown $USER:$USER keystore.dat
   /usr/local/bin/elastos-ela-cli wallet add -p ${pswd}
-  sudo cp keystore.dat /data/elastos/arbiter/keystore.dat
-  sudo chown elauser:elauser /data/elastos/arbiter/keystore.dat 
+  cp keystore.dat /data/elastos/arbiter/keystore.dat
+  chown elauser:elauser /data/elastos/arbiter/keystore.dat 
 fi
-sudo chmod 644 /data/elastos/arbiter/keystore.dat
+chmod 644 /data/elastos/arbiter/keystore.dat
 
 echo ""
 echo "Modifying the config file parameters for Carrier Bootstrap node"
-sudo sed -i "s#// external_ip.*#external_ip = \"$(curl ifconfig.me)\"#g" /data/elastos/carrier/bootstrap.conf
+sed -i "s#// external_ip.*#external_ip = \"$(curl ifconfig.me)\"#g" /data/elastos/carrier/bootstrap.conf
 
 echo ""
 echo "Modifying the config file parameters for Metrics node"
@@ -152,9 +157,9 @@ else
   usr=$(cat params.env | grep AUTH_USER | sed 's#.*AUTH_USER=##g' | sed 's#"##g')
   pswd=$(cat params.env | grep AUTH_PASSWORD | sed 's#.*AUTH_PASSWORD=##g' | sed 's#"##g')
 fi 
-sudo sed -i "s#PORT=.*#PORT=\"${port}\"#g" /etc/elastos-metrics/params.env
-sudo sed -i "s#AUTH_USER=.*#AUTH_USER=\"${usr}\"#g" /etc/elastos-metrics/params.env
-sudo sed -i "s#AUTH_PASSWORD=.*#AUTH_PASSWORD=\"${pswd}\"#g" /etc/elastos-metrics/params.env
+sed -i "s#PORT=.*#PORT=\"${port}\"#g" /etc/elastos-metrics/params.env
+sed -i "s#AUTH_USER=.*#AUTH_USER=\"${usr}\"#g" /etc/elastos-metrics/params.env
+sed -i "s#AUTH_PASSWORD=.*#AUTH_PASSWORD=\"${pswd}\"#g" /etc/elastos-metrics/params.env
 
 echo ""
 echo "Modifying the config file parameters for Prometheus and Alertmanager"
@@ -165,7 +170,7 @@ then
 else 
   supernodeName=$(cat prometheus.yml | grep replacement | sed 's#.*replacement: ##g' | sed 's#:9100##g' | sed 's#"##g')
 fi 
-sudo sed -i "s#replacement:.*#replacement: \"${supernodeName}:9100\"#g" /data/elastos/metrics/conf/prometheus.yml
+sed -i "s#replacement:.*#replacement: \"${supernodeName}:9100\"#g" /data/elastos/metrics/conf/prometheus.yml
 read -p "Would you like to change your smtp settings for Alertmanager configuration? [y/N] " answer 
 if [[ "${answer}" == "y" ]] || [[ "${answer}" == "Y" ]] || [[ "${answer}" == "yes" ]]
 then
@@ -181,14 +186,14 @@ else
   smtp_auth_username=$(cat alertmanager.yml | grep smtp_auth_username | sed 's#.*smtp_auth_username: ##g' | sed 's#"##g')
   smtp_auth_password=$(cat alertmanager.yml | grep smtp_auth_password | sed 's#.*smtp_auth_password: ##g' | sed 's#"##g')
 fi 
-sudo sed -i "s#smtp_smarthost:.*#smtp_smarthost: \"${smtp_smarthost}\"#g" /data/elastos/metrics/conf/alertmanager.yml
-sudo sed -i "s#smtp_from:.*#smtp_from: \"${smtp_from}\"#g" /data/elastos/metrics/conf/alertmanager.yml
-sudo sed -i "s#smtp_auth_username:.*#smtp_auth_username: \"${smtp_auth_username}\"#g" /data/elastos/metrics/conf/alertmanager.yml
-sudo sed -i "s#smtp_auth_password:.*#smtp_auth_password: \"${smtp_auth_password}\"#g" /data/elastos/metrics/conf/alertmanager.yml
-sudo sed -i "s#to:.*#to: \"${smtp_to}\"#g" /data/elastos/metrics/conf/alertmanager.yml
+sed -i "s#smtp_smarthost:.*#smtp_smarthost: \"${smtp_smarthost}\"#g" /data/elastos/metrics/conf/alertmanager.yml
+sed -i "s#smtp_from:.*#smtp_from: \"${smtp_from}\"#g" /data/elastos/metrics/conf/alertmanager.yml
+sed -i "s#smtp_auth_username:.*#smtp_auth_username: \"${smtp_auth_username}\"#g" /data/elastos/metrics/conf/alertmanager.yml
+sed -i "s#smtp_auth_password:.*#smtp_auth_password: \"${smtp_auth_password}\"#g" /data/elastos/metrics/conf/alertmanager.yml
+sed -i "s#to:.*#to: \"${smtp_to}\"#g" /data/elastos/metrics/conf/alertmanager.yml
 
 echo ""
 echo "Starting up all the services required for running the supernode"
-sudo systemctl restart elastos-ela elastos-did elastos-arbiter elastos-carrier-bootstrap elastos-metrics prometheus prometheus-node-exporter prometheus-pushgateway prometheus-alertmanager
+systemctl restart elastos-ela elastos-did elastos-arbiter elastos-carrier-bootstrap elastos-metrics prometheus prometheus-node-exporter prometheus-pushgateway prometheus-alertmanager
 
-# sudo systemctl stop elastos-ela elastos-did elastos-arbiter elastos-carrier-bootstrap elastos-metrics prometheus prometheus-node-exporter prometheus-pushgateway prometheus-alertmanager; sudo apt-get purge "elastos-ela" "elastos-did" "elastos-arbiter" "elastos-carrier-bootstrap" "elastos-metrics" -y; sudo rm -rf /data/elastos /etc/elastos-*
+# systemctl stop elastos-ela elastos-did elastos-arbiter elastos-carrier-bootstrap elastos-metrics prometheus prometheus-node-exporter prometheus-pushgateway prometheus-alertmanager; apt-get purge "elastos-ela" "elastos-did" "elastos-arbiter" "elastos-carrier-bootstrap" "elastos-metrics" -y; rm -rf /data/elastos /etc/elastos-*

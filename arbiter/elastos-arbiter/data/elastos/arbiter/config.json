@@ -2,7 +2,7 @@
   "Configuration": {
     "MainNode": {
       "Rpc": {
-        "IpAddress": "127.0.0.1",
+        "IpAddress": "localhost",
         "HttpJsonPort": 20336,
         "User": "mainchain_rpc_user",
         "Pass": "mainchain_rpc_pass"
@@ -11,7 +11,7 @@
     "SideNodeList": [
       {
         "Rpc": {
-          "IpAddress": "127.0.0.1",
+          "IpAddress": "localhost",
           "HttpJsonPort": 20606,
           "User": "did_rpc_user",
           "Pass": "did_rpc_pass"
@@ -25,7 +25,7 @@
       },
       {
         "Rpc": {
-          "IpAddress": "127.0.0.1",
+          "IpAddress": "localhost",
           "HttpJsonPort": 20632,
           "User": "eth_rpc_user",
           "Pass": "eth_rpc_pass"

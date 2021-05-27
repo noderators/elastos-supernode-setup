@@ -5,7 +5,7 @@
 ## How to setup and run an Elastos supernode
 
 ```
-./setup.sh
+sudo ./setup.sh
 ```
 
 ## Change additional configs(OPTIONAL)
@@ -90,7 +90,7 @@
 
 - Whenever there is a new package available, you need to download the latest `setup.sh` file from this repo and then run it like so:
   ```
-  ./setup.sh
+  sudo ./setup.sh
   ```
 - Any time you restart an instance, you're stopping the node for main chain, did sidechain, smart contract sidehchain, etc and then starting them again. You should also make sure to not upgrade elastos-ela without first making sure that your supernode is not currently in queue to submit a block proposal. You can check when your supernode will be proposing a block next by going to [https://www.noderators.org/arbitratorsonduty/](https://www.noderators.org/arbitratorsonduty/)
 - You can also check for this using your command line by doing the following
