@@ -7,8 +7,8 @@
     "EnableRPC": true,
     "HttpJsonPort": 20336,
     "RpcConfiguration": {
-      "User": "user",
-      "Pass": "password",
+      "User": "",
+      "Pass": "",
       "WhiteIPList": ["0.0.0.0"]
     }
   }

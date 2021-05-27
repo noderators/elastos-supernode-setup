@@ -2,134 +2,63 @@
 
 - Ubuntu Server 18.04 LTS
 
-## Pre-requisites for building the packages yourself
+## How to setup and run an Elastos supernode
 
-- Docker(if you want to build the .deb packages)
+```
+./setup.sh
+```
 
-## How to build and install everything yourself(the hard way)
+## Change additional configs(OPTIONAL)
 
-1. Build the .deb packages on your ubuntu machine
+- If you want to enable REST API Port on your ELA mainchain node, update /data/elastos/ela/config.json and do the following:
 
-   ```
-   docker build -t deb-builder:18.04 -f tools/ubuntu-18.04.Dockerfile .;
-   docker run -it -w /elastos-supernode-setup -v /Users/kpachhai/dev/src/github.com/noderators/elastos-supernode-setup:/elastos-supernode-setup -e USER=501 -e GROUP=20 --rm deb-builder:18.04 /elastos-supernode-setup/tools/build_packages.sh
-   ```
+  - Add `"HttpRestStart": true,` inside `"Configuration"` object
+  - Add `"HttpRestPort": 20334,` where `"20334"` is the port of your choosing
 
-2. Install the packages
-   ```
-   sudo dpkg -i --force-confmiss ela/elastos-ela_0.7.0-1.deb did/elastos-did_0.2.0-1.deb token/elastos-token_0.1.2-3.deb carrier/elastos-carrier-bootstrap_5.2.3-2.deb metrics/elastos-metrics_1.3.1-1.deb;
-   sudo apt-get install -f
-   ```
+- If you want to enable REST API Port on your DID sidechain node, update /data/elastos/did/config.json and do the following:
 
-## How to download and install the packages(the easy way)
+  - Add `"EnableREST": true,`
+  - Add `"RESTPort": 20604` where `"20604"` is the port of your choosing
 
-1. Go to releases at [https://github.com/noderators/elastos-supernode-setup/releases](https://github.com/noderators/elastos-supernode-setup/releases)
+- Once you change any config, make sure to restart the appropriate service
+  ```
+  sudo systemctl restart elastos-ela
+  sudo systemctl restart elastos-did
+  ```
 
-2. Download all the deb packages
+## Debugging
 
-3. Install the packages
-   ```
-   sudo apt-get install prometheus prometheus-node-exporter prometheus-pushgateway prometheus-alertmanager jq python3;
-   sudo dpkg -i --force-confmiss elastos-ela_0.7.0-1.deb elastos-did_0.2.0-1.deb elastos-token_0.1.2-3.deb elastos-carrier-bootstrap_5.2.3-2.deb elastos-metrics_1.3.1-1.deb;
-   sudo apt-get install -f
-   ```
+- In case your mainchain node becomes inactive for whatever reason, please do the following to move to active status again
+  ```bash
+  cd /data/elastos/ela;
+  sudo su;
+  # Replace 'todo_keystore_password' with your own password for your keystore.dat file. You can find this at /etc/elastos-ela/params.env
+  KEYSTORE_PASSWORD='todo_keystore_password';
+  # Replace 'todo_rpc_user' with your own RPC username for your ELA mainchain node. You can find this at /data/elastos/ela/config.json
+  RPCUSERNAME='todo_rpc_user';
+  # Replace 'todo_rpc_pass' with your own RPC password for your ELA mainchain node. You can find this at /data/elastos/ela/config.json
+  RPCPASSWORD='todo_rpc_pass';
+  NODEKEY=$(elastos-ela-cli wallet a -p ${KEYSTORE_PASSWORD} | tail -2 | head -1 | cut -d' ' -f2);
+  elastos-ela-cli wallet buildtx activate --nodepublickey ${NODEKEY} -p ${KEYSTORE_PASSWORD};
+  elastos-ela-cli wallet sendtx -f ready_to_send.txn --rpcuser ${RPCUSERNAME} --rpcpassword ${RPCPASSWORD};
+  rm -f ready_to_send.txn
+  ```
 
-## Change configs
+## Miscellaneous
 
-1. Replace /data/elastos/ela/keystore.dat with your own keystore.dat
+### How to set up an smtp server to be used for setting up alerts within Alertmanager
 
-   ```
-   rm -f /data/elastos/ela/keystore.dat;
-   /usr/local/bin/elastos-ela-cli wallet create -p $YOURPASSWORDHERE
-   cp keystore.dat /data/elastos/ela/keystore.dat
-   sudo chown elauser:elauser /data/elastos/ela/keystore.dat
-   ```
-
-2. Update /data/elastos/ela/config.json
-
-   - Change "IPAddress" to your own public IP address
-   - Change "User" to your own username you want to set
-   - Change "Pass" to your own password you want to set
-   - Change "HttpJsonPort" to the port of your choosing
-   - If you want to enable REST API Port, add
-     `"HttpRestStart": true,`
-   - Change "HttpRestPort" to the port of your choosing
-
-3. Update /etc/elastos-ela/params.env
-
-   - Change "KEYSTORE_PASSWORD" to your own keystore password you set above(whatever $YOURPASSWORDHERE is)
-
-4. Update /data/elastos/did/config.json
-
-   - Change "RPCUser" to your own username you want to set
-   - Change "RPCPass" to your own username you want to set
-   - Change "RPCPort" to the port of your choosing
-   - If you want to enable REST API Port, add
-     `"EnableREST": true,`
-   - Change "RESTPort" to the port of your choosing
-
-5. Update /data/elastos/token/config.json
-
-   - Change "RPCUser" to your own username you want to set
-   - Change "RPCPass" to your own username you want to set
-   - Change "RPCPort" to the port of your choosing
-   - If you want to enable REST API Port, add
-     `"EnableREST": true,`
-   - Change "RESTPort" to the port of your choosing
-
-6. Update /data/elastos/carrier/bootstrap.conf
-
-   - Change "external_ip" to your own public IP address. Make sure to remove the 2 backslashes "//" from the line too
-
-7. Update /etc/elastos-metrics/params.env
-
-   - Change "PORT", "AUTH_USER" and "AUTH_PASSWORD" to your own choosing
-
-8. Update /data/elastos/metrics/conf/prometheus.yml
-
-   - Right above the line with "metric_relabel_configs:", add the following:
-     ```
-     relabel_configs:
-       - source_labels: [__address__]
-         regex:  '.*'
-         target_label: instance
-         replacement: '$YOURNODENAME:9100'
-     ```
-     Make sure to replace $YOURNODENAME with your own supernode name. Every time email is sent, it'll have this label. This comes in handy if you're running multiple supernodes
-
-9. Set up an smtp server
-
-   - Option 1: You can install postfix by following the directions at [https://hostadvice.com/how-to/how-to-setup-postfix-as-send-only-mail-server-on-an-ubuntu-18-04-dedicated-server-or-vps/](https://hostadvice.com/how-to/how-to-setup-postfix-as-send-only-mail-server-on-an-ubuntu-18-04-dedicated-server-or-vps/)
-   - Option 2: If you're using AWS, you can use AWS SES service to set up a SMTP server for free
-     1. Follow the directions at [https://docs.aws.amazon.com/ses/latest/DeveloperGuide/verify-email-addresses.html](https://docs.aws.amazon.com/ses/latest/DeveloperGuide/verify-email-addresses.html) to first verify your email
-     2. Go to [https://console.aws.amazon.com/ses/](https://console.aws.amazon.com/ses/)
-     3. In the navigation pane on the left side of the Amazon SES console, under **Identity Management**, choose **Email Addresses** to view the email address that you verified from step 1
-     4. In the list of identities, check the box next to email address that you have verified
-     5. Choose **Send a Test Email** to send a test email so you know it works correctly
-     6. In the navigation pane, choose **SMTP Settings**
-     7. In the content pane, choose **Create My SMTP Credentials**
-     8. For **Create User for SMTP**, type a name for your SMTP user. Alternatively, you can use the default value that is provided in this field. When you finish, choose **Create**
-     9. Choose **Show User SMTP Credentials**. Your SMTP credentials are shown on the screen. Copy these credentials and store them in a safe place. You can also choose **Download Credentials** to download a file that contains your credentials.
-   - Update /data/elastos/metrics/conf/alertmanager.yml and change the values for "smtp_smarthost", "smtp_from", "smtp_auth_username" and "smtp_auth_password" to your own setting
-
-10. Now, start up your services
-
-    ```
-    sudo systemctl restart elastos-ela elastos-did elastos-token elastos-carrier-bootstrap elastos-metrics prometheus prometheus-node-exporter prometheus-pushgateway prometheus-alertmanager
-    ```
-
-11. In case your mainchain node becomes inactive for whatever reason, please do the following to move to active status again
-    ```
-    cd /data/elastos/ela;
-    sudo su;
-    KEYSTORE_PASSWORD='YOUROWNKEYSTOREPASSWORDHERE';
-    RPCUSERNAME='YOURRPCUSERNAMEHERE';
-    RPCPASSWORD='YOURRPCPASSHERE';
-    YOURNODEKEY=$(elastos-ela-cli wallet a -p $KEYSTORE_PASSWORD | tail -2 | head -1 | cut -d' ' -f2);
-    elastos-ela-cli wallet buildtx activate --nodepublickey $YOURNODEKEY -p $KEYSTORE_PASSWORD;
-    elastos-ela-cli wallet sendtx -f ready_to_send.txn --rpcuser $RPCUSERNAME --rpcpassword $RPCPASSWORD;
-    rm -f ready_to_send.txn
-    ```
+- Option 1: You can install postfix by following the directions at [https://hostadvice.com/how-to/how-to-setup-postfix-as-send-only-mail-server-on-an-ubuntu-18-04-dedicated-server-or-vps/](https://hostadvice.com/how-to/how-to-setup-postfix-as-send-only-mail-server-on-an-ubuntu-18-04-dedicated-server-or-vps/)
+- Option 2: If you're using AWS, you can use AWS SES service to set up a SMTP server for free
+  1.  Follow the directions at [https://docs.aws.amazon.com/ses/latest/DeveloperGuide/verify-email-addresses.html](https://docs.aws.amazon.com/ses/latest/DeveloperGuide/verify-email-addresses.html) to first verify your email
+  2.  Go to [https://console.aws.amazon.com/ses/](https://console.aws.amazon.com/ses/)
+  3.  In the navigation pane on the left side of the Amazon SES console, under **Identity Management**, choose **Email Addresses** to view the email address that you verified from step 1
+  4.  In the list of identities, check the box next to email address that you have verified
+  5.  Choose **Send a Test Email** to send a test email so you know it works correctly
+  6.  In the navigation pane, choose **SMTP Settings**
+  7.  In the content pane, choose **Create My SMTP Credentials**
+  8.  For **Create User for SMTP**, type a name for your SMTP user. Alternatively, you can use the default value that is provided in this field. When you finish, choose **Create**
+  9.  Choose **Show User SMTP Credentials**. Your SMTP credentials are shown on the screen. Copy these credentials and store them in a safe place. You can also choose **Download Credentials** to download a file that contains your credentials.
 
 ## Check your metrics
 
@@ -159,15 +88,14 @@
 
 ## Upgrade instructions
 
-- Whenever there is a new package available, you need to upgrade your package on your machine to receive the latest apps so follow the instructions on the releases page at [https://github.com/noderators/elastos-supernode-setup/releases](https://github.com/noderators/elastos-supernode-setup/releases)
-- Any time you restart an instance, you're stopping the node for main chain, did sidechain, token sidehchain, etc and then starting them again. You should also make sure to not upgrade elastos-ela without first making sure that your supernode is not currently in queue to submit a block proposal. You can check when your supernode will be proposing a block next by going to [https://www.noderators.org/arbitratorsonduty/](https://www.noderators.org/arbitratorsonduty/)
-- You can also check for this using your command line by doing the following
+- Whenever there is a new package available, you need to download the latest `setup.sh` file from this repo and then run it like so:
   ```
-  curl --user user:password -H 'Content-Type: application/json' -H 'Accept:application/json' --data '{"method":"getarbitersinfo"}' http://localhost:20336
+  ./setup.sh
+  ```
+- Any time you restart an instance, you're stopping the node for main chain, did sidechain, smart contract sidehchain, etc and then starting them again. You should also make sure to not upgrade elastos-ela without first making sure that your supernode is not currently in queue to submit a block proposal. You can check when your supernode will be proposing a block next by going to [https://www.noderators.org/arbitratorsonduty/](https://www.noderators.org/arbitratorsonduty/)
+- You can also check for this using your command line by doing the following
+  ```bash
+  # Replace 'todo_rpc_user' and 'todo_rpc_password' with your own RPC username and password. You can find this at /data/elastos/ela/config.json
+  curl --user todo_rpc_user:todo_rpc_password -H 'Content-Type: application/json' -H 'Accept:application/json' --data '{"method":"getarbitersinfo"}' http://localhost:20336
   ```
   Should return the current onduty supernode(arbiter) and the next list of supernodes in queue to submit block proposals every block(~2 minutes)
-
-## Roadmap for this repository
-
-- Support redhat/centos machines by putting out rpm packages in addition to deb packages
-- Create a grafana dashboard for your supernode using elastos-metrics package

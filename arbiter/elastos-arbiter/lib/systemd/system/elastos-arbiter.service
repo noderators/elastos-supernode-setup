@@ -1,0 +1,15 @@
+[Unit]
+Description=Elastos Arbiter Node Daemon
+After=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/data/elastos/arbiter
+ExecStart=/usr/local/bin/elastos-arbiter
+
+User=elauser
+Group=elauser
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

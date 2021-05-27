@@ -1,13 +1,9 @@
 {
   "SPVDisableDNS": false,
-  "SPVPermanentPeers": [
-    "localhost:20338"
-  ],
+  "SPVPermanentPeers": ["localhost:20338"],
   "EnableRPC": true,
   "RPCPort": 20606,
   "RPCUser": "user",
   "RPCPass": "password",
-  "RPCWhiteList": [
-    "0.0.0.0"
-  ]
+  "RPCWhiteList": ["0.0.0.0"]
 }

@@ -1,0 +1,13 @@
+Package: elastos-arbiter
+Source: noderators
+Version: 0.2.1-1
+Architecture: amd64
+Maintainer: Kiran Pachhai <kiran.pachhai@gmail.com>
+Pre-Depends: adduser
+Depends: libsystemd0
+Homepage: http://www.elastos.org/
+Description: Elastos Arbiter Node (daemon)
+ Elastos Arbiter is used to connect Elastos mainchain to the other 
+ Elastos sidechains and is used to faciliate cross-chain transfer
+ of assets. This package contains the elastos arbiter node daemon. 
+ 
