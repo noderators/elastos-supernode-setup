@@ -19,12 +19,16 @@ do
   fi
 done
 
-# Let's backup these files just in case the user does not want to change any settings with the new release
-sudo cp /data/elastos/ela/config.json mainchain_config.json 
-sudo cp /data/elastos/ela/keystore.dat mainchain_keystore.dat
-sudo cp /data/elastos/arbiter/keystore.dat arbiter_keystore.dat
-sudo cp /data/elastos/did/config.json did_config.json 
-sudo cp /etc/elastos-metrics/params.env /data/elastos/metrics/conf/prometheus.yml /data/elastos/metrics/conf/alertmanager.yml .
+if [ -f /data/elastos/ela/keystore.dat ]
+then
+  PREVIOUS_INSTALL="yes"
+  # Let's backup these files just in case the user does not want to change any settings with the new release
+  sudo cp /data/elastos/ela/keystore.dat mainchain_keystore.dat
+  sudo cp /data/elastos/ela/config.json mainchain_config.json 
+  sudo cp /data/elastos/arbiter/keystore.dat arbiter_keystore.dat
+  sudo cp /data/elastos/did/config.json did_config.json 
+  sudo cp /etc/elastos-metrics/params.env /data/elastos/metrics/conf/prometheus.yml /data/elastos/metrics/conf/alertmanager.yml .
+fi
 
 echo ""
 echo "Downloading packages required for Elastos Supernode"
@@ -54,6 +58,15 @@ sudo dpkg -i --force-confmiss ${DEB_DIRECTORY}/arbiter/elastos-arbiter_0.2.1-1.d
 sudo dpkg -i --force-confmiss ${DEB_DIRECTORY}/carrier/elastos-carrier-bootstrap_5.2.3-3.deb
 sudo dpkg -i --force-confmiss ${DEB_DIRECTORY}/metrics/elastos-metrics_1.4.0-1.deb
 
+if [[ "${PREVIOUS_INSTALL}" != "yes" ]]
+then
+  # Let's backup these files just in case the user does not want to change any settings with the new release
+  sudo cp /data/elastos/ela/keystore.dat mainchain_keystore.dat
+  sudo cp /data/elastos/ela/config.json mainchain_config.json 
+  sudo cp mainchain_keystore.dat arbiter_keystore.dat
+  sudo cp /data/elastos/did/config.json did_config.json 
+  sudo cp /etc/elastos-metrics/params.env /data/elastos/metrics/conf/prometheus.yml /data/elastos/metrics/conf/alertmanager.yml .
+fi
 
 echo ""
 echo "Personalizing your Elastos Supernode setup"
@@ -72,6 +85,7 @@ else
   sudo cp mainchain_keystore.dat /data/elastos/ela/keystore.dat
   sudo cp arbiter_keystore.dat /data/elastos/arbiter/keystore.dat
 fi
+sudo chmod 644 /data/elastos/ela/keystore.dat
 
 echo ""
 echo "Modifying the config file parameters for ELA mainchain node"
@@ -82,13 +96,13 @@ then
   read -p "Enter the username for RPC configuration: " usr
   read -p "Enter the password for RPC configuration: " pswd
 else 
-  usr=$(cat mainchain_config.json | grep User | sed 's#.*User": ##g' | sed 's#"##g')
-  pswd=$(cat mainchain_config.json | grep Pass | sed 's#.*Pass": ##g' | sed 's#"##g')
+  usr=$(cat mainchain_config.json | grep User | sed 's#.*User": ##g' | sed 's#,##g' | sed 's#"##g')
+  pswd=$(cat mainchain_config.json | grep Pass | sed 's#.*Pass": ##g' | sed 's#,##g' | sed 's#"##g')
 fi
-sudo sed -i "s#\"User\":.*#\"User\": \"${usr}\"#g" /data/elastos/ela/config.json
-sudo sed -i "s#\"Pass\":.*#\"Pass\": \"${pswd}\"#g" /data/elastos/ela/config.json 
-sudo sed -i "s#\"mainchain_rpc_user\"#${usr}#g" /data/elastos/arbiter/config.json
-sudo sed -i "s#\"mainchain_rpc_pass\"#${pswd}#g" /data/elastos/arbiter/config.json
+sudo sed -i "s#\"User\":.*#\"User\": \"${usr}\",#g" /data/elastos/ela/config.json
+sudo sed -i "s#\"Pass\":.*#\"Pass\": \"${pswd}\",#g" /data/elastos/ela/config.json 
+sudo sed -i "s#mainchain_rpc_user#${usr}#g" /data/elastos/arbiter/config.json
+sudo sed -i "s#mainchain_rpc_pass#${pswd}#g" /data/elastos/arbiter/config.json
 
 echo ""
 echo "Modifying the config file parameters for DID sidechain node"
@@ -98,13 +112,13 @@ then
   read -p "Enter the username for RPC configuration: " usr
   read -p "Enter the password for RPC configuration: " pswd
 else 
-  usr=$(cat did_config.json | grep RPCUser | sed 's#.*RPCUser": ##g' | sed 's#"##g')
-  pswd=$(cat did_config.json | grep RPCPass | sed 's#.*RPCPass": ##g' | sed 's#"##g')
+  usr=$(cat did_config.json | grep RPCUser | sed 's#.*RPCUser": ##g' | sed 's#,##g' | sed 's#"##g')
+  pswd=$(cat did_config.json | grep RPCPass | sed 's#.*RPCPass": ##g' | sed 's#,##g' | sed 's#"##g')
 fi
-sudo sed -i "s#\"RPCUser\":.*#\"RPCUser\": \"${usr}\"#g" /data/elastos/did/config.json
-sudo sed -i "s#\"RPCPass\":.*#\"RPCPass\": \"${pswd}\"#g" /data/elastos/did/config.json
-sudo sed -i "s#\"did_rpc_user\"#${usr}#g" /data/elastos/arbiter/config.json
-sudo sed -i "s#\"did_rpc_pass\"#${pswd}#g" /data/elastos/arbiter/config.json
+sudo sed -i "s#\"RPCUser\":.*#\"RPCUser\": \"${usr}\",#g" /data/elastos/did/config.json
+sudo sed -i "s#\"RPCPass\":.*#\"RPCPass\": \"${pswd}\",#g" /data/elastos/did/config.json
+sudo sed -i "s#did_rpc_user#${usr}#g" /data/elastos/arbiter/config.json
+sudo sed -i "s#did_rpc_pass#${pswd}#g" /data/elastos/arbiter/config.json
 
 pswd=$(cat /etc/elastos-ela/params.env | grep KEYSTORE_PASSWORD | sed 's#.*KEYSTORE_PASSWORD=##g' | sed 's#"##g')
 sudo cp /data/elastos/arbiter/keystore.dat .
@@ -119,6 +133,7 @@ then
   sudo cp keystore.dat /data/elastos/arbiter/keystore.dat
   sudo chown elauser:elauser /data/elastos/arbiter/keystore.dat 
 fi
+sudo chmod 644 /data/elastos/arbiter/keystore.dat
 
 echo ""
 echo "Modifying the config file parameters for Carrier Bootstrap node"
@@ -148,7 +163,7 @@ if [[ "${answer}" == "y" ]] || [[ "${answer}" == "Y" ]] || [[ "${answer}" == "ye
 then
   read -p "Enter the name of your supernode: " supernodeName
 else 
-  supernodeName=$(cat prometheus.yml | grep replacement | sed 's#.*replacement: ##g' | sed 's#"##g')
+  supernodeName=$(cat prometheus.yml | grep replacement | sed 's#.*replacement: ##g' | sed 's#:9100##g' | sed 's#"##g')
 fi 
 sudo sed -i "s#replacement:.*#replacement: \"${supernodeName}:9100\"#g" /data/elastos/metrics/conf/prometheus.yml
 read -p "Would you like to change your smtp settings for Alertmanager configuration? [y/N] " answer 

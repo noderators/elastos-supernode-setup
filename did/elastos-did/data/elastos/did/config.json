@@ -3,7 +3,7 @@
   "SPVPermanentPeers": ["localhost:20338"],
   "EnableRPC": true,
   "RPCPort": 20606,
-  "RPCUser": "user",
-  "RPCPass": "password",
+  "RPCUser": "",
+  "RPCPass": "",
   "RPCWhiteList": ["0.0.0.0"]
 }
