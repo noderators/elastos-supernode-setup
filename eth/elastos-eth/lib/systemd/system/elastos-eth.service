@@ -1,0 +1,26 @@
+[Unit]
+Description=Elastos Smart Contract Sidechain(Eth) Service
+After=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/data/elastos/eth
+EnvironmentFile=/etc/elastos-eth/params.env
+ExecStart=/usr/local/bin/elastos-geth     \
+            --datadir ${DATADIR}          \
+            --mine --miner.threads 1      \
+            --rpc --rpcvhosts '*' --rpcaddr '0.0.0.0'           \
+            --rpcapi 'personal,db,eth,net,web3,txpool,miner'    \
+            --unlock  ${UNLOCK_ADDRESS}                         \
+            --password ${MINER_PASSWORD_FILE}                   \
+            --pbft.keystore.password ${KEYSTORE_PASSWORD_FILE}  \
+            --pbft.net.address ${IPADDRESS}                     \
+            --pbft.net.port 20639                               \
+            --allow-insecure-unlock
+            
+User=elauser
+Group=elauser
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

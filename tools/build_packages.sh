@@ -34,7 +34,7 @@ build_deb_package ela elastos-ela 0.7.0-2
 
 build_deb_package did elastos-did 0.2.0-2
 
-#build_deb_package eth elastos-eth 0.1.2-3
+build_deb_package eth elastos-eth 0.1.2-1
 
 build_deb_package arbiter elastos-arbiter 0.2.1-1
 

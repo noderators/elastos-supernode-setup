@@ -6,15 +6,35 @@ if [[ $(/usr/bin/id -u) -ne 0 ]]; then
 fi
 
 MYTMPDIR="$(mktemp -d)"
+WORK_DIR="${HOME}/.noderators"
+mkdir -p ${WORK_DIR}
+
 trap 'rm -rf -- "$MYTMPDIR"' EXIT
 cd ${MYTMPDIR}
 
 RELEASE="v1.24"
 
+function stop_script () {
+  ERROR=$1
+  if [ ! -z "${ERROR}" ]
+  then
+    echo "Encountered an error: ${ERROR}"
+    echo "Exiting..."
+  else
+    echo 'Cleaning up and exiting...'
+  fi
+  rm -rf ${TMP_DIR}
+  exit 1
+}
+trap stop_script EXIT
+
 echo "Updating the system packages"
 apt-get update -y 
-echo "Installing dependencies if not installed"
-DEPS=( "wget" "jq" "python3" "prometheus" "prometheus-node-exporter" "prometheus-pushgateway" "prometheus-alertmanager" )
+echo "Installing third party tools and dependencies"
+curl -sL https://deb.nodesource.com/setup_12.x | sudo -E bash -
+apt-get install -y python3 python3-pip nodejs || stop_script "Cannot install third party tools and dependencies"
+echo "Installing dependencies for Elastos Supernode if not installed"
+DEPS=( "prometheus" "prometheus-node-exporter" "prometheus-pushgateway" "prometheus-alertmanager" )
 for dep in "${DEPS[@]}"
 do
   dpkg -s ${dep} >/dev/null 2>&1
@@ -30,15 +50,17 @@ then
   # Let's backup these files just in case the user does not want to change any settings with the new release
   cp /data/elastos/ela/keystore.dat mainchain_keystore.dat
   cp /data/elastos/ela/config.json mainchain_config.json 
-  cp /data/elastos/arbiter/keystore.dat arbiter_keystore.dat
   cp /data/elastos/did/config.json did_config.json 
+  cp /data/elastos/eth/keystore.dat eth_keystore.dat
+  cp /data/elastos/eth/data/keystore/miner-keystore.dat eth_miner_keystore.dat
+  cp /data/elastos/arbiter/keystore.dat arbiter_keystore.dat
   cp /etc/elastos-metrics/params.env /data/elastos/metrics/conf/prometheus.yml /data/elastos/metrics/conf/alertmanager.yml .
 fi
 
 echo ""
 echo "Downloading packages required for Elastos Supernode"
-DEPS=( "elastos-ela" "elastos-did" "elastos-arbiter" "elastos-carrier-bootstrap" "elastos-metrics" )
-VERSIONS=( "0.7.0-2" "0.2.0-2" "0.2.1-1" "5.2.3-3" "1.4.0-1" )
+DEPS=( "elastos-ela" "elastos-did" "elastos-eth" "elastos-arbiter" "elastos-carrier-bootstrap" "elastos-metrics" )
+VERSIONS=( "0.7.0-2" "0.2.0-2" "0.1.2-1" "0.2.1-1" "5.2.3-3" "1.4.0-1" )
 '''
 for i in "${!DEPS[@]}"
 do 
@@ -59,6 +81,7 @@ done
 DEB_DIRECTORY="/home/kpachhai/repos/github.com/noderators/elastos-supernode-setup"
 dpkg -i --force-confmiss ${DEB_DIRECTORY}/ela/elastos-ela_0.7.0-2.deb
 dpkg -i --force-confmiss ${DEB_DIRECTORY}/did/elastos-did_0.2.0-2.deb
+dpkg -i --force-confmiss ${DEB_DIRECTORY}/eth/elastos-eth_0.1.2-1.deb
 dpkg -i --force-confmiss ${DEB_DIRECTORY}/arbiter/elastos-arbiter_0.2.1-1.deb
 dpkg -i --force-confmiss ${DEB_DIRECTORY}/carrier/elastos-carrier-bootstrap_5.2.3-3.deb
 dpkg -i --force-confmiss ${DEB_DIRECTORY}/metrics/elastos-metrics_1.4.0-1.deb
@@ -68,8 +91,10 @@ then
   # Let's backup these files just in case the user does not want to change any settings with the new release
   cp /data/elastos/ela/keystore.dat mainchain_keystore.dat
   cp /data/elastos/ela/config.json mainchain_config.json 
-  cp mainchain_keystore.dat arbiter_keystore.dat
   cp /data/elastos/did/config.json did_config.json 
+  cp /data/elastos/eth/keystore.dat eth_keystore.dat
+  cp /data/elastos/eth/data/keystore/miner-keystore.dat eth_miner_keystore.dat 
+  cp /data/elastos/arbiter/keystore.dat arbiter_keystore.dat
   cp /etc/elastos-metrics/params.env /data/elastos/metrics/conf/prometheus.yml /data/elastos/metrics/conf/alertmanager.yml .
 fi
 
@@ -84,10 +109,14 @@ then
   /usr/local/bin/elastos-ela-cli wallet create -p ${pswd}
   mv keystore.dat /data/elastos/ela/keystore.dat
   chown elauser:elauser /data/elastos/ela/keystore.dat 
+  cp /data/elastos/ela/keystore.dat /data/elastos/eth/keystore.dat
   cp /data/elastos/ela/keystore.dat /data/elastos/arbiter/keystore.dat
   sed -i "s#KEYSTORE_PASSWORD=.*#KEYSTORE_PASSWORD=\"${pswd}\"#g" /etc/elastos-ela/params.env
+  keyword_password_file=$(cat /etc/elastos-eth/params.env | grep KEYSTORE_PASSWORD_FILE | sed 's#.*KEYSTORE_PASSWORD_FILE=##g' | sed 's#"##g')
+  echo ${pswd} > ${keyword_password_file}
 else 
   cp mainchain_keystore.dat /data/elastos/ela/keystore.dat
+  cp eth_keystore.dat /data/elastos/eth/keystore.dat
   cp arbiter_keystore.dat /data/elastos/arbiter/keystore.dat
 fi
 chmod 644 /data/elastos/ela/keystore.dat
@@ -124,6 +153,32 @@ cat <<< $(jq ".RPCUser = \"${usr}\"" /data/elastos/did/config.json) > /data/elas
 cat <<< $(jq ".RPCPass = \"${pswd}\"" /data/elastos/did/config.json) > /data/elastos/did/config.json
 cat <<< $(jq ".Configuration.SideNodeList[0].Rpc.User = \"${usr}\"" /data/elastos/arbiter/config.json) > /data/elastos/arbiter/config.json
 cat <<< $(jq ".Configuration.SideNodeList[0].Rpc.Pass = \"${pswd}\"" /data/elastos/arbiter/config.json) > /data/elastos/arbiter/config.json
+
+echo ""
+echo "Modifying the config file parameters for Smart Contract Sidechain(ETH) node"
+read -p "WARNING! You're trying to create a new eth miner wallet. This may replace your previous wallet if it exists already. Proceed? [y/N] " answer
+if [[ "${answer}" == "y" ]] || [[ "${answer}" == "Y" ]] || [[ "${answer}" == "yes" ]]
+then 
+  rm -f /data/elastos/eth/data/keystore/miner-keystore.dat
+  read -p "Enter the password for your miner-keystore.dat: " pswd
+  miner_password_file=$(cat /etc/elastos-eth/params.env | grep MINER_PASSWORD_FILE | sed 's#.*MINER_PASSWORD_FILE=##g' | sed 's#"##g')
+  echo ${pswd} > ${miner_password_file}
+  echo "Creating a eth miner wallet with the given password"
+  datadir=$(cat /etc/elastos-eth/params.env | grep DATADIR | sed 's#.*DATADIR=##g' | sed 's#"##g')
+  /usr/local/bin/elastos-geth --datadir ${datadir} account new --password ${miner_password_file}
+  mv /data/elastos/eth/data/keystore/UTC* /data/elastos/eth/data/keystore/miner-keystore.dat
+  chown elauser:elauser /data/elastos/eth/data/keystore/miner-keystore.dat 
+else 
+  cp eth_miner_keystore.dat /data/elastos/eth/data/keystore/miner-keystore.dat
+fi
+chmod 644 /data/elastos/eth/data/keystore/miner-keystore.dat
+unlock_address=$(echo 0x$(cat /data/elastos/eth/data/keystore/miner-keystore.dat | jq -r .address))
+sed -i "s#UNLOCK_ADDRESS=.*#UNLOCK_ADDRESS=\"${unlock_address}\"#g" /etc/elastos-eth/params.env
+ipaddress=$(curl ifconfig.me)
+sed -i "s#IPADDRESS=.*#IPADDRESS=\"${ipaddress}\"#g" /etc/elastos-eth/params.env
+cd /data/elastos/eth/oracle
+npm install
+cd ${MYTMPDIR}
 
 pswd=$(cat /etc/elastos-ela/params.env | grep KEYSTORE_PASSWORD | sed 's#.*KEYSTORE_PASSWORD=##g' | sed 's#"##g')
 cp /data/elastos/arbiter/keystore.dat .
@@ -194,6 +249,6 @@ sed -i "s#to:.*#to: \"${smtp_to}\"#g" /data/elastos/metrics/conf/alertmanager.ym
 
 echo ""
 echo "Starting up all the services required for running the supernode"
-systemctl restart elastos-ela elastos-did elastos-arbiter elastos-carrier-bootstrap elastos-metrics prometheus prometheus-node-exporter prometheus-pushgateway prometheus-alertmanager
+systemctl restart elastos-ela elastos-did elastos-eth elastos-eth-oracle elastos-arbiter elastos-carrier-bootstrap elastos-metrics prometheus prometheus-node-exporter prometheus-pushgateway prometheus-alertmanager
 
-# systemctl stop elastos-ela elastos-did elastos-arbiter elastos-carrier-bootstrap elastos-metrics prometheus prometheus-node-exporter prometheus-pushgateway prometheus-alertmanager; apt-get purge "elastos-ela" "elastos-did" "elastos-arbiter" "elastos-carrier-bootstrap" "elastos-metrics" -y; rm -rf /data/elastos /etc/elastos-*
+# systemctl stop elastos-ela elastos-did elastos-eth elastos-eth-oracle elastos-arbiter elastos-carrier-bootstrap elastos-metrics prometheus prometheus-node-exporter prometheus-pushgateway prometheus-alertmanager; apt-get purge "elastos-ela" "elastos-did" "elastos-eth" "elastos-arbiter" "elastos-carrier-bootstrap" "elastos-metrics" -y; rm -rf /data/elastos /etc/elastos-*

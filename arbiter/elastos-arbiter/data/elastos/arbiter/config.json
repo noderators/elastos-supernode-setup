@@ -4,8 +4,8 @@
       "Rpc": {
         "IpAddress": "localhost",
         "HttpJsonPort": 20336,
-        "User": "mainchain_rpc_user",
-        "Pass": "mainchain_rpc_pass"
+        "User": "",
+        "Pass": ""
       }
     },
     "SideNodeList": [
@@ -13,8 +13,8 @@
         "Rpc": {
           "IpAddress": "localhost",
           "HttpJsonPort": 20606,
-          "User": "did_rpc_user",
-          "Pass": "did_rpc_pass"
+          "User": "",
+          "Pass": ""
         },
         "SyncStartHeight": 401000,
         "ExchangeRate": 1.0,
@@ -27,8 +27,8 @@
         "Rpc": {
           "IpAddress": "localhost",
           "HttpJsonPort": 20632,
-          "User": "eth_rpc_user",
-          "Pass": "eth_rpc_pass"
+          "User": "",
+          "Pass": ""
         },
         "SyncStartHeight": 2515000,
         "ExchangeRate": 1.0,
