@@ -10,6 +10,7 @@ ExecStart=/usr/local/bin/elastos-geth     \
             --datadir ${DATADIR}          \
             --mine --miner.threads 1      \
             --rpc --rpcvhosts '*' --rpcaddr '0.0.0.0'           \
+            --rpcport ${RPCPORT}                                \
             --rpcapi 'personal,db,eth,net,web3,txpool,miner'    \
             --unlock  ${UNLOCK_ADDRESS}                         \
             --password ${MINER_PASSWORD_FILE}                   \

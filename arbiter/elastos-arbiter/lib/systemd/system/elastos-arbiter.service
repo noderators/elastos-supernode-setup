@@ -1,6 +1,6 @@
 [Unit]
 Description=Elastos Arbiter Node Daemon
-After=network-online.target
+After=network-online.target elastos-ela.service elastos-did.service elastos-eth.service
 
 [Service]
 Type=simple

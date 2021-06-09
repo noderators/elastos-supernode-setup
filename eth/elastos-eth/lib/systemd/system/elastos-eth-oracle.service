@@ -1,6 +1,6 @@
 [Unit]
 Description=Elastos Smart Contract Sidechain Oracle Service
-After=network-online.target
+After=network-online.target elastos-eth.service
 
 [Service]
 Type=simple

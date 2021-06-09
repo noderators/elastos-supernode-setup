@@ -5,5 +5,7 @@
   "RPCPort": 20606,
   "RPCUser": "",
   "RPCPass": "",
-  "RPCWhiteList": ["0.0.0.0"]
+  "RPCWhiteList": ["0.0.0.0"],
+  "PayToAddr": "EHohTEm9oVUY5EQxm8MDb6fBEoRpwTyjbb",
+  "MinerInfo": "Noderators - Watermelon"
 }

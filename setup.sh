@@ -1,18 +1,18 @@
 #!/usr/bin/env bash
 
+RELEASE="v1.24"
+
+# If not running with sudo, exit 
 if [[ $(/usr/bin/id -u) -ne 0 ]]; then
   echo "This script needs to run with sudo priviledges. Please re-run the script as root"
   exit
 fi
 
+# Create a temporary directory that will be deleted when the script exits or is interrupted
 MYTMPDIR="$(mktemp -d)"
-WORK_DIR="${HOME}/.noderators"
-mkdir -p ${WORK_DIR}
-
 trap 'rm -rf -- "$MYTMPDIR"' EXIT
-cd ${MYTMPDIR}
 
-RELEASE="v1.24"
+cd ${MYTMPDIR}
 
 function stop_script () {
   ERROR=$1
@@ -28,6 +28,7 @@ function stop_script () {
 }
 trap stop_script EXIT
 
+# Prepare by updating packages and installing dependencies before the installation
 echo "Updating the system packages"
 apt-get update -y 
 echo "Installing third party tools and dependencies"
@@ -44,23 +45,31 @@ do
   fi
 done
 
+# Make sure to backup important config files and wallets before proceeding just in case something goes wrong
 if [ -f /data/elastos/ela/keystore.dat ]
 then
   PREVIOUS_INSTALL="yes"
   # Let's backup these files just in case the user does not want to change any settings with the new release
-  cp /data/elastos/ela/keystore.dat mainchain_keystore.dat
-  cp /data/elastos/ela/config.json mainchain_config.json 
-  cp /data/elastos/did/config.json did_config.json 
-  cp /data/elastos/eth/keystore.dat eth_keystore.dat
-  cp /data/elastos/eth/data/keystore/miner-keystore.dat eth_miner_keystore.dat
-  cp /data/elastos/arbiter/keystore.dat arbiter_keystore.dat
-  cp /etc/elastos-metrics/params.env /data/elastos/metrics/conf/prometheus.yml /data/elastos/metrics/conf/alertmanager.yml .
+  NOW=$(date +"%Y-%m-%dT%H:%M:%S")
+  mkdir -p /data/elastos/backup/${NOW}
+  cp /data/elastos/ela/keystore.dat mainchain_keystore.dat; cp /data/elastos/ela/keystore.dat /data/elastos/backup/${NOW}/mainchain_keystore.dat
+  cp /data/elastos/ela/config.json mainchain_config.json; cp /data/elastos/ela/config.json /data/elastos/backup/${NOW}/mainchain_config.json
+  cp /data/elastos/did/config.json did_config.json; cp /data/elastos/did/config.json /data/elastos/backup/${NOW}/did_config.json
+  cp /data/elastos/eth/keystore.dat eth_keystore.dat; cp /data/elastos/eth/keystore.dat /data/elastos/backup/${NOW}/eth_keystore.dat
+  cp /data/elastos/eth/data/keystore/miner-keystore.dat eth_miner_keystore.dat; cp /data/elastos/eth/data/keystore/miner-keystore.dat /data/elastos/backup/${NOW}/miner-keystore.dat
+  cp /etc/elastos-eth/params.env eth_params.env; cp /etc/elastos-eth/params.env /data/elastos/backup/${NOW}/eth_params.env
+  cp /data/elastos/arbiter/config.json arbiter_config.json; cp /data/elastos/arbiter/config.json /data/elastos/backup/${NOW}/arbiter_config.json
+  cp /data/elastos/arbiter/keystore.dat arbiter_keystore.dat; cp /data/elastos/arbiter/keystore.dat /data/elastos/backup/${NOW}/arbiter_keystore.dat
+  cp /etc/elastos-metrics/params.env metrics_params.env; cp /etc/elastos-metrics/params.env /data/elastos/backup/${NOW}/metrics_params.env
+  cp /data/elastos/metrics/conf/prometheus.yml prometheus.yml; cp /data/elastos/metrics/conf/prometheus.yml /data/elastos/backup/${NOW}/prometheus.yml
+  cp /data/elastos/metrics/conf/alertmanager.yml alertmanager.yml; cp /data/elastos/metrics/conf/alertmanager.yml /data/elastos/backup/${NOW}/alertmanager.yml
 fi
 
+# Download all the noderators packages required for setting up Elastos Supernode
 echo ""
 echo "Downloading packages required for Elastos Supernode"
 DEPS=( "elastos-ela" "elastos-did" "elastos-eth" "elastos-arbiter" "elastos-carrier-bootstrap" "elastos-metrics" )
-VERSIONS=( "0.7.0-2" "0.2.0-2" "0.1.2-1" "0.2.1-1" "5.2.3-3" "1.4.0-1" )
+VERSIONS=( "0.7.0-2" "0.3.1-1" "0.1.2-1" "0.2.1-1" "5.2.3-3" "1.4.0-1" )
 '''
 for i in "${!DEPS[@]}"
 do 
@@ -70,7 +79,7 @@ do
   if [ $(echo $?) -ne "0" ]
   then 
     echo "Installing ${DEPS[$i]} Version: ${VERSIONS[$i]}"
-    dpkg -i --force-confmiss "${DEPS[$i]}_${VERSIONS[$i]}.deb"
+    dpkg -i --force-confnew "${DEPS[$i]}_${VERSIONS[$i]}.deb"
     apt-get install -f
   else  
     echo "${DEPS[$i]} is already the latest version with Version: ${VERSIONS[$i]}"
@@ -78,26 +87,37 @@ do
 done
 '''
 
+# TODO: Delete before git push
 DEB_DIRECTORY="/home/kpachhai/repos/github.com/noderators/elastos-supernode-setup"
-dpkg -i --force-confmiss ${DEB_DIRECTORY}/ela/elastos-ela_0.7.0-2.deb
-dpkg -i --force-confmiss ${DEB_DIRECTORY}/did/elastos-did_0.2.0-2.deb
-dpkg -i --force-confmiss ${DEB_DIRECTORY}/eth/elastos-eth_0.1.2-1.deb
-dpkg -i --force-confmiss ${DEB_DIRECTORY}/arbiter/elastos-arbiter_0.2.1-1.deb
-dpkg -i --force-confmiss ${DEB_DIRECTORY}/carrier/elastos-carrier-bootstrap_5.2.3-3.deb
-dpkg -i --force-confmiss ${DEB_DIRECTORY}/metrics/elastos-metrics_1.4.0-1.deb
+dpkg -i --force-confnew ${DEB_DIRECTORY}/ela/elastos-ela_0.7.0-2.deb
+dpkg -i --force-confnew ${DEB_DIRECTORY}/did/elastos-did_0.3.1-1.deb
+dpkg -i --force-confnew ${DEB_DIRECTORY}/eth/elastos-eth_0.1.2-1.deb
+dpkg -i --force-confnew ${DEB_DIRECTORY}/arbiter/elastos-arbiter_0.2.1-1.deb
+dpkg -i --force-confnew ${DEB_DIRECTORY}/carrier/elastos-carrier-bootstrap_5.2.3-3.deb
+dpkg -i --force-confnew ${DEB_DIRECTORY}/metrics/elastos-metrics_1.4.0-1.deb
+apt-get install -f
 
+# If this is the first time installing packages, we wanna make sure to copy required info from config files 
+# from the packages that were just installed
 if [[ "${PREVIOUS_INSTALL}" != "yes" ]]
 then
   # Let's backup these files just in case the user does not want to change any settings with the new release
-  cp /data/elastos/ela/keystore.dat mainchain_keystore.dat
-  cp /data/elastos/ela/config.json mainchain_config.json 
-  cp /data/elastos/did/config.json did_config.json 
-  cp /data/elastos/eth/keystore.dat eth_keystore.dat
-  cp /data/elastos/eth/data/keystore/miner-keystore.dat eth_miner_keystore.dat 
-  cp /data/elastos/arbiter/keystore.dat arbiter_keystore.dat
-  cp /etc/elastos-metrics/params.env /data/elastos/metrics/conf/prometheus.yml /data/elastos/metrics/conf/alertmanager.yml .
+  NOW=$(date +"%Y-%m-%dT%H:%M:%S")
+  mkdir -p /data/elastos/backup/${NOW}
+  cp /data/elastos/ela/keystore.dat mainchain_keystore.dat; cp /data/elastos/ela/keystore.dat /data/elastos/backup/${NOW}/mainchain_keystore.dat
+  cp /data/elastos/ela/config.json mainchain_config.json; cp /data/elastos/ela/config.json /data/elastos/backup/${NOW}/mainchain_config.json
+  cp /data/elastos/did/config.json did_config.json; cp /data/elastos/did/config.json /data/elastos/backup/${NOW}/did_config.json
+  cp /data/elastos/eth/keystore.dat eth_keystore.dat; cp /data/elastos/eth/keystore.dat /data/elastos/backup/${NOW}/eth_keystore.dat
+  cp /data/elastos/eth/data/keystore/miner-keystore.dat eth_miner_keystore.dat; cp /data/elastos/eth/data/keystore/miner-keystore.dat /data/elastos/backup/${NOW}/miner-keystore.dat
+  cp /etc/elastos-eth/params.env eth_params.env; cp /etc/elastos-eth/params.env /data/elastos/backup/${NOW}/eth_params.env
+  cp /data/elastos/arbiter/config.json arbiter_config.json; cp /data/elastos/arbiter/config.json /data/elastos/backup/${NOW}/arbiter_config.json
+  cp /data/elastos/arbiter/keystore.dat arbiter_keystore.dat; cp /data/elastos/arbiter/keystore.dat /data/elastos/backup/${NOW}/arbiter_keystore.dat
+  cp /etc/elastos-metrics/params.env metrics_params.env; cp /etc/elastos-metrics/params.env /data/elastos/backup/${NOW}/metrics_params.env
+  cp /data/elastos/metrics/conf/prometheus.yml prometheus.yml; cp /data/elastos/metrics/conf/prometheus.yml /data/elastos/backup/${NOW}/prometheus.yml
+  cp /data/elastos/metrics/conf/alertmanager.yml alertmanager.yml; cp /data/elastos/metrics/conf/alertmanager.yml /data/elastos/backup/${NOW}/alertmanager.yml
 fi
 
+# Create a new wallet for ELA mainchain node or do nothing depending on what the user wants to do
 echo ""
 echo "Personalizing your Elastos Supernode setup"
 read -p "WARNING! You're trying to create a new wallet. This may replace your previous wallet if it exists already. Proceed? [y/N] " answer
@@ -121,39 +141,74 @@ else
 fi
 chmod 644 /data/elastos/ela/keystore.dat
 
+# Configure all the configs for RPC and miner info for ELA mainchain node
 echo ""
 echo "Modifying the config file parameters for ELA mainchain node"
 cat <<< $(jq ".Configuration.DPoSConfiguration.IPAddress = \"$(curl ifconfig.me)\"" /data/elastos/ela/config.json) > /data/elastos/ela/config.json
-read -p "Would you like to change the current username and password for RPC configuration for this node? [y/N] " answer
+read -p "Would you like to change the current info for RPC configuration and/or miner configuration for this node? [y/N] " answer
 if [[ "${answer}" == "y" ]] || [[ "${answer}" == "Y" ]] || [[ "${answer}" == "yes" ]]
 then
-  read -p "Enter the username for RPC configuration: " usr
-  read -p "Enter the password for RPC configuration: " pswd
+  read -p "Enter the port you would like to set for RPC configuration: " port
+  read -p "Enter the username you would like to set for RPC configuration: " usr
+  read -p "Enter the password you would like to set for RPC configuration: " pswd
+  read -p "Enter the ELA address you would like to set for miner fees payout: " elaaddr
+  read -p "Enter the miner name you would like to assign to your node: " minername
 else 
+  port=$(cat mainchain_config.json | jq -r ".Configuration.HttpJsonPort")
   usr=$(cat mainchain_config.json | jq -r ".Configuration.RpcConfiguration.User")
   pswd=$(cat mainchain_config.json | jq -r ".Configuration.RpcConfiguration.Pass")
+  elaaddr=$(cat mainchain_config.json | jq -r ".Configuration.PowConfiguration.PayToAddr")
+  minername=$(cat mainchain_config.json | jq -r ".Configuration.PowConfiguration.MinerInfo")
 fi
+if [[ ${port} = null ]] || [[ -z ${port} ]]; then port="20336"; fi
+if [[ ${usr} = null ]]; then usr=""; fi
+if [[ ${pswd} = null ]]; then pswd=""; fi
+if [[ ${elaaddr} = null ]] || [[ -z ${elaaddr} ]]; then elaaddr="EHohTEm9oVUY5EQxm8MDb6fBEoRpwTyjbb"; fi
+if [[ ${minername} = null ]] || [[ -z ${minername} ]]; then minername="Noderators - Watermelon"; fi
+cat <<< $(jq ".Configuration.HttpJsonPort = ${port}" /data/elastos/ela/config.json) > /data/elastos/ela/config.json
 cat <<< $(jq ".Configuration.RpcConfiguration.User = \"${usr}\"" /data/elastos/ela/config.json) > /data/elastos/ela/config.json
 cat <<< $(jq ".Configuration.RpcConfiguration.Pass = \"${pswd}\"" /data/elastos/ela/config.json) > /data/elastos/ela/config.json
+cat <<< $(jq ".Configuration.PowConfiguration.PayToAddr = \"${elaaddr}\"" /data/elastos/ela/config.json) > /data/elastos/ela/config.json
+cat <<< $(jq ".Configuration.PowConfiguration.MinerInfo = \"${minername}\"" /data/elastos/ela/config.json) > /data/elastos/ela/config.json
+cat <<< $(jq ".Configuration.MainNode.Rpc.HttpJsonPort = ${port}" /data/elastos/arbiter/config.json) > /data/elastos/arbiter/config.json
 cat <<< $(jq ".Configuration.MainNode.Rpc.User = \"${usr}\"" /data/elastos/arbiter/config.json) > /data/elastos/arbiter/config.json
 cat <<< $(jq ".Configuration.MainNode.Rpc.Pass = \"${pswd}\"" /data/elastos/arbiter/config.json) > /data/elastos/arbiter/config.json
 
+# Configure all the configs for RPC and miner info for DID sidechain node
 echo ""
 echo "Modifying the config file parameters for DID sidechain node"
-read -p "Would you like to change the current username and password for RPC configuration for this node? [y/N] " answer
+read -p "Would you like to change the current info for RPC configuration and/or miner configuration for this node? [y/N] " answer
 if [[ "${answer}" == "y" ]] || [[ "${answer}" == "Y" ]] || [[ "${answer}" == "yes" ]]
 then
-  read -p "Enter the username for RPC configuration: " usr
-  read -p "Enter the password for RPC configuration: " pswd
+  read -p "Enter the port you would like to set for RPC configuration: " port
+  read -p "Enter the username you would like to set for RPC configuration: " usr
+  read -p "Enter the password you would like to set for RPC configuration: " pswd
+  read -p "Enter the ELA address you would like to set for miner fees payout: " elaaddr
+  read -p "Enter the miner name you would like to assign to your node: " minername
 else 
+  port=$(cat did_config.json | jq -r ".RPCPort")
   usr=$(cat did_config.json | jq -r ".RPCUser")
   pswd=$(cat did_config.json | jq -r ".RPCPass")
+  elaaddr=$(cat did_config.json | jq -r ".PayToAddr")
+  minername=$(cat did_config.json | jq -r ".MinerInfo")
 fi
+if [[ ${port} = null ]] || [[ -z ${port} ]]; then port="20606"; fi
+if [[ ${usr} = null ]]; then usr=""; fi
+if [[ ${pswd} = null ]]; then pswd=""; fi
+if [[ ${elaaddr} = null ]] || [[ -z ${elaaddr} ]]; then elaaddr="EHohTEm9oVUY5EQxm8MDb6fBEoRpwTyjbb"; fi
+if [[ ${minername} = null ]] || [[ -z ${minername} ]]; then minername="Noderators - Watermelon"; fi
+cat <<< $(jq ".RPCPort = ${port}" /data/elastos/did/config.json) > /data/elastos/did/config.json
 cat <<< $(jq ".RPCUser = \"${usr}\"" /data/elastos/did/config.json) > /data/elastos/did/config.json
 cat <<< $(jq ".RPCPass = \"${pswd}\"" /data/elastos/did/config.json) > /data/elastos/did/config.json
+cat <<< $(jq ".PayToAddr = \"${elaaddr}\"" /data/elastos/did/config.json) > /data/elastos/did/config.json
+cat <<< $(jq ".MinerInfo = \"${minername}\"" /data/elastos/did/config.json) > /data/elastos/did/config.json
+cat <<< $(jq ".Configuration.SideNodeList[0].Rpc.HttpJsonPort = ${port}" /data/elastos/arbiter/config.json) > /data/elastos/arbiter/config.json
 cat <<< $(jq ".Configuration.SideNodeList[0].Rpc.User = \"${usr}\"" /data/elastos/arbiter/config.json) > /data/elastos/arbiter/config.json
 cat <<< $(jq ".Configuration.SideNodeList[0].Rpc.Pass = \"${pswd}\"" /data/elastos/arbiter/config.json) > /data/elastos/arbiter/config.json
+cat <<< $(jq ".Configuration.SideNodeList[0].PayToAddr = \"${elaaddr}\"" /data/elastos/arbiter/config.json) > /data/elastos/arbiter/config.json
 
+# Configure all the configs for Smart Contract sidechain(ETH) node such as creating miner wallet if it 
+# does not exist 
 echo ""
 echo "Modifying the config file parameters for Smart Contract Sidechain(ETH) node"
 read -p "WARNING! You're trying to create a new eth miner wallet. This may replace your previous wallet if it exists already. Proceed? [y/N] " answer
@@ -172,14 +227,42 @@ else
   cp eth_miner_keystore.dat /data/elastos/eth/data/keystore/miner-keystore.dat
 fi
 chmod 644 /data/elastos/eth/data/keystore/miner-keystore.dat
+read -p "Would you like to change the current info for RPC configuration and/or miner configuration for this node? [y/N] " answer
+if [[ "${answer}" == "y" ]] || [[ "${answer}" == "Y" ]] || [[ "${answer}" == "yes" ]]
+then
+  read -p "Enter the port you would like to set for RPC configuration: " port
+else 
+  port=$(cat eth_params.env | grep RPCPORT | sed 's#.*RPCPORT=##g' | sed 's#"##g')
+fi
+if [[ ${port} = null ]] || [[ -z ${port} ]]; then port="20636"; fi
+sed -i "s#RPCPORT=.*#RPCPORT=\"${port}\"#g" /etc/elastos-eth/params.env
+cat <<< $(jq ".Configuration.SideNodeList[1].Rpc.HttpJsonPort = ${port}" /data/elastos/arbiter/config.json) > /data/elastos/arbiter/config.json
 unlock_address=$(echo 0x$(cat /data/elastos/eth/data/keystore/miner-keystore.dat | jq -r .address))
 sed -i "s#UNLOCK_ADDRESS=.*#UNLOCK_ADDRESS=\"${unlock_address}\"#g" /etc/elastos-eth/params.env
+cat <<< $(jq ".Configuration.SideNodeList[1].PayToAddr = \"${unlock_address}\"" /data/elastos/arbiter/config.json) > /data/elastos/arbiter/config.json
 ipaddress=$(curl ifconfig.me)
 sed -i "s#IPADDRESS=.*#IPADDRESS=\"${ipaddress}\"#g" /etc/elastos-eth/params.env
 cd /data/elastos/eth/oracle
 npm install
 cd ${MYTMPDIR}
 
+# Configure all the configs for RPC and miner info for Arbiter node
+echo ""
+echo "Modifying the config file parameters for Arbiter node"
+read -p "Would you like to change the current info for RPC configuration and/or miner configuration for this node? [y/N] " answer
+if [[ "${answer}" == "y" ]] || [[ "${answer}" == "Y" ]] || [[ "${answer}" == "yes" ]]
+then
+  read -p "Enter the username you would like to set for RPC configuration: " usr
+  read -p "Enter the password you would like to set for RPC configuration: " pswd
+else 
+  usr=$(cat arbiter_config.json | jq -r ".Configuration.RpcConfiguration.User")
+  pswd=$(cat arbiter_config.json | jq -r ".Configuration.RpcConfiguration.Pass")
+fi
+if [[ ${usr} = null ]]; then usr=""; fi
+if [[ ${pswd} = null ]]; then pswd=""; fi
+cat <<< $(jq ".Configuration.RpcConfiguration.User = \"${usr}\"" /data/elastos/arbiter/config.json) > /data/elastos/arbiter/config.json
+cat <<< $(jq ".Configuration.RpcConfiguration.Pass = \"${pswd}\"" /data/elastos/arbiter/config.json) > /data/elastos/arbiter/config.json
+# Creating a secondary wallet if it doesn't exist
 pswd=$(cat /etc/elastos-ela/params.env | grep KEYSTORE_PASSWORD | sed 's#.*KEYSTORE_PASSWORD=##g' | sed 's#"##g')
 cp /data/elastos/arbiter/keystore.dat .
 NUM_WALLETS=$(elastos-ela-cli wallet a -p ${pswd} | grep - | wc -l)
@@ -195,10 +278,12 @@ then
 fi
 chmod 644 /data/elastos/arbiter/keystore.dat
 
+# Configure all the configs for Carrier Bootstrap node
 echo ""
 echo "Modifying the config file parameters for Carrier Bootstrap node"
 sed -i "s#// external_ip.*#external_ip = \"$(curl ifconfig.me)\"#g" /data/elastos/carrier/bootstrap.conf
 
+# Configure all the configs for Metrics node such as setting up username and password
 echo ""
 echo "Modifying the config file parameters for Metrics node"
 read -p "Would you like to change the current settings for metrics endpoint? [y/N] " answer 
@@ -208,14 +293,16 @@ then
   read -p "Enter the username to be used for exposing your supernode metrics: " usr
   read -p "Enter the password to be used for exposing your supernode metrics: " pswd
 else 
-  port=$(cat params.env | grep PORT | sed 's#.*PORT=##g' | sed 's#"##g')
-  usr=$(cat params.env | grep AUTH_USER | sed 's#.*AUTH_USER=##g' | sed 's#"##g')
-  pswd=$(cat params.env | grep AUTH_PASSWORD | sed 's#.*AUTH_PASSWORD=##g' | sed 's#"##g')
+  port=$(cat metrics_params.env | grep PORT | sed 's#.*PORT=##g' | sed 's#"##g')
+  usr=$(cat metrics_params.env | grep AUTH_USER | sed 's#.*AUTH_USER=##g' | sed 's#"##g')
+  pswd=$(cat metrics_params.env | grep AUTH_PASSWORD | sed 's#.*AUTH_PASSWORD=##g' | sed 's#"##g')
 fi 
 sed -i "s#PORT=.*#PORT=\"${port}\"#g" /etc/elastos-metrics/params.env
 sed -i "s#AUTH_USER=.*#AUTH_USER=\"${usr}\"#g" /etc/elastos-metrics/params.env
 sed -i "s#AUTH_PASSWORD=.*#AUTH_PASSWORD=\"${pswd}\"#g" /etc/elastos-metrics/params.env
 
+# Configure all the configs for Prometheus and Alertmanager such as setting up alerts to be
+# sent to the user's email
 echo ""
 echo "Modifying the config file parameters for Prometheus and Alertmanager"
 read -p "Would you like to change your supernode name for Prometheus configuration? [y/N] " answer 
@@ -247,8 +334,39 @@ sed -i "s#smtp_auth_username:.*#smtp_auth_username: \"${smtp_auth_username}\"#g"
 sed -i "s#smtp_auth_password:.*#smtp_auth_password: \"${smtp_auth_password}\"#g" /data/elastos/metrics/conf/alertmanager.yml
 sed -i "s#to:.*#to: \"${smtp_to}\"#g" /data/elastos/metrics/conf/alertmanager.yml
 
+# Start all the services required for running the Elastos supernode
 echo ""
 echo "Starting up all the services required for running the supernode"
-systemctl restart elastos-ela elastos-did elastos-eth elastos-eth-oracle elastos-arbiter elastos-carrier-bootstrap elastos-metrics prometheus prometheus-node-exporter prometheus-pushgateway prometheus-alertmanager
+systemctl daemon-reload
+systemctl restart elastos-ela elastos-did elastos-eth elastos-eth-oracle elastos-carrier-bootstrap elastos-metrics prometheus prometheus-node-exporter prometheus-pushgateway prometheus-alertmanager
 
-# systemctl stop elastos-ela elastos-did elastos-eth elastos-eth-oracle elastos-arbiter elastos-carrier-bootstrap elastos-metrics prometheus prometheus-node-exporter prometheus-pushgateway prometheus-alertmanager; apt-get purge "elastos-ela" "elastos-did" "elastos-eth" "elastos-arbiter" "elastos-carrier-bootstrap" "elastos-metrics" -y; rm -rf /data/elastos /etc/elastos-*
+# Make sure the nodes are healthy before starting up arbiter node
+# Check for mainchain node
+status=""
+while [[ ${status} != "ready" ]]
+do 
+  port=$(cat /data/elastos/ela/config.json | jq -r ".Configuration.HttpJsonPort")
+  usr=$(cat /data/elastos/ela/config.json | jq -r ".Configuration.RpcConfiguration.User")
+  pswd=$(cat /data/elastos/ela/config.json | jq -r ".Configuration.RpcConfiguration.Pass")
+  height=$(curl -X POST --user ${usr}:${pswd} http://localhost:${port} -H 'Content-Type: application/json' -d '{"method":"getnodestate"}' | jq ".result.height")
+  if [[ ${height} != null ]] && [[ ! -z "${height}" ]]; then status="ready"; else sleep 5; fi
+done
+# Check for did node
+status=""
+while [[ ${status} != "ready" ]]
+do 
+  port=$(cat /data/elastos/did/config.json | jq -r ".RPCPort")
+  usr=$(cat /data/elastos/did/config.json | jq -r ".RPCUser")
+  pswd=$(cat /data/elastos/did/config.json | jq -r ".RPCPass")
+  height=$(curl -X POST --user ${usr}:${pswd} http://localhost:${port} -H 'Content-Type: application/json' -d '{"method":"getnodestate"}' | jq ".result.height")
+  if [[ ${height} != null ]] && [[ ! -z "${height}" ]]; then status="ready"; else sleep 5; fi
+done
+# Check for eth node
+status=""
+while [[ ${status} != "ready" ]]
+do 
+  port=$(cat /etc/elastos-eth/params.env | grep RPCPORT | sed 's#.*RPCPORT=##g' | sed 's#"##g')
+  height=$(curl -X POST http://localhost:${port} -H 'Content-Type: application/json' -d '{"method":"eth_blockNumber", "id":1}' | jq -r ".result")
+  if [[ ${height} != null ]] && [[ ! -z "${height}" ]]; then status="ready"; else sleep 5; fi
+done
+systemctl restart elastos-arbiter 

@@ -26,22 +26,33 @@ sudo ./setup.sh
   sudo systemctl restart elastos-did
   ```
 
-## Debugging
+## Verify whether the supernode has started running
 
-- In case your mainchain node becomes inactive for whatever reason, please do the following to move to active status again
-  ```bash
-  cd /data/elastos/ela;
-  sudo su;
-  # Replace 'todo_keystore_password' with your own password for your keystore.dat file. You can find this at /etc/elastos-ela/params.env
-  KEYSTORE_PASSWORD='todo_keystore_password';
-  # Replace 'todo_rpc_user' with your own RPC username for your ELA mainchain node. You can find this at /data/elastos/ela/config.json
-  RPCUSERNAME='todo_rpc_user';
-  # Replace 'todo_rpc_pass' with your own RPC password for your ELA mainchain node. You can find this at /data/elastos/ela/config.json
-  RPCPASSWORD='todo_rpc_pass';
-  NODEKEY=$(elastos-ela-cli wallet a -p ${KEYSTORE_PASSWORD} | tail -2 | head -1 | cut -d' ' -f2);
-  elastos-ela-cli wallet buildtx activate --nodepublickey ${NODEKEY} -p ${KEYSTORE_PASSWORD};
-  elastos-ela-cli wallet sendtx -f ready_to_send.txn --rpcuser ${RPCUSERNAME} --rpcpassword ${RPCPASSWORD};
-  rm -f ready_to_send.txn
+- Check current height for ELA mainchain node
+
+  ```
+  port=$(cat /data/elastos/ela/config.json | jq -r ".Configuration.HttpJsonPort")
+  usr=$(cat /data/elastos/ela/config.json | jq -r ".Configuration.RpcConfiguration.User")
+  pswd=$(cat /data/elastos/ela/config.json | jq -r ".Configuration.RpcConfiguration.Pass")
+  height=$(curl -X POST --user ${usr}:${pswd} http://localhost:${port} -H 'Content-Type: application/json' -d '{"method":"getnodestate"}' | jq ".result.height")
+  echo ${height}
+  ```
+
+- Check current height for DID sidechain node
+
+  ```
+  port=$(cat /data/elastos/did/config.json | jq -r ".RPCPort")
+  usr=$(cat /data/elastos/did/config.json | jq -r ".RPCUser")
+  pswd=$(cat /data/elastos/did/config.json | jq -r ".RPCPass")
+  height=$(curl -X POST --user ${usr}:${pswd} http://localhost:${port} -H 'Content-Type: application/json' -d '{"method":"getnodestate"}' | jq ".result.height")
+  echo ${height}
+  ```
+
+- Check current height for Smart Contract sidechain(ETH) node
+  ```
+  port=$(cat /etc/elastos-eth/params.env | grep RPCPORT | sed 's#.*RPCPORT=##g' | sed 's#"##g')
+  height=$(curl -X POST http://localhost:${port} -H 'Content-Type: application/json' -d '{"method":"eth_blockNumber", "id":1}' | jq -r ".result")
+  echo ${height}
   ```
 
 ## Miscellaneous
@@ -59,6 +70,24 @@ sudo ./setup.sh
   7.  In the content pane, choose **Create My SMTP Credentials**
   8.  For **Create User for SMTP**, type a name for your SMTP user. Alternatively, you can use the default value that is provided in this field. When you finish, choose **Create**
   9.  Choose **Show User SMTP Credentials**. Your SMTP credentials are shown on the screen. Copy these credentials and store them in a safe place. You can also choose **Download Credentials** to download a file that contains your credentials.
+
+## What to do in case your supernode becomes inactive
+
+- In case your mainchain node becomes inactive for whatever reason, please do the following to move to active status again
+  ```bash
+  cd /data/elastos/ela;
+  sudo su;
+  # Replace 'todo_keystore_password' with your own password for your keystore.dat file. You can find this at /etc/elastos-ela/params.env
+  KEYSTORE_PASSWORD='todo_keystore_password';
+  # Replace 'todo_rpc_user' with your own RPC username for your ELA mainchain node. You can find this at /data/elastos/ela/config.json
+  RPCUSERNAME='todo_rpc_user';
+  # Replace 'todo_rpc_pass' with your own RPC password for your ELA mainchain node. You can find this at /data/elastos/ela/config.json
+  RPCPASSWORD='todo_rpc_pass';
+  NODEKEY=$(elastos-ela-cli wallet a -p ${KEYSTORE_PASSWORD} | tail -2 | head -1 | cut -d' ' -f2);
+  elastos-ela-cli wallet buildtx activate --nodepublickey ${NODEKEY} -p ${KEYSTORE_PASSWORD};
+  elastos-ela-cli wallet sendtx -f ready_to_send.txn --rpcuser ${RPCUSERNAME} --rpcpassword ${RPCPASSWORD};
+  rm -f ready_to_send.txn
+  ```
 
 ## Check your metrics
 
