@@ -45,9 +45,9 @@ do
   fi
 done
 # Remove token sidechain stuff as it's no longer needed to be run
-apt-get remove elastos-token; rm -rf /data/elastos/token 
+apt-get remove elastos-token -y; rm -rf /data/elastos/token 
 # Remove ioex node as it's no longer supported
-apt-get remove ioex-mainchain; rm -rf /data/ioex
+apt-get remove ioex-mainchain -y; rm -rf /data/ioex
 
 # Make sure to backup important config files and wallets before proceeding just in case something goes wrong
 if [ -f /data/elastos/ela/keystore.dat ]
