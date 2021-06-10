@@ -40,6 +40,25 @@ def main():
         handle_eth_sidechain(session)
     except:
         pass 
+
+    # Arbiter Node State 
+    try:
+        handle_arbiter(session)
+    except:
+        pass 
+
+    # Carrier Boostrap Node State 
+    try:
+        handle_carrier_bootstrap(session)
+    except:
+        pass 
+
+    # Metrics Node State 
+    try:
+        handle_metrics(session)
+    except Exception as e:
+        print(str(e))
+        pass
     
 def handle_mainchain(session):
     rpcport, rpcuser, rpcpassword = getConfigs("/data/elastos/ela/config.json", chain="main")
@@ -48,7 +67,7 @@ def handle_mainchain(session):
     node_version = node_state["compile"]
     services = node_state["services"]
     with open("/data/elastos/metrics/prometheus/node-exporter/elastos-metrics.prom", "w") as out:
-        out.write(f'elastos_metrics_nodestate{{chain="main",nodeversion="{node_version}",services="{services}"}} {height}\n')
+        out.write(f'elastos_metrics_nodestate{{chain="main",rpcport="{int(rpcport)}",nodeversion="{node_version}",services="{services}"}} {height}\n')
 
 def handle_dpos(session):
     nodekey = getNodeKeyFromKeystoreFile()
@@ -85,7 +104,7 @@ def handle_did_sidechain(session):
     node_version = node_state["compile"]
     services = node_state["services"]
     with open("/data/elastos/metrics/prometheus/node-exporter/elastos-metrics.prom", "a") as out:
-        out.write(f'elastos_metrics_nodestate{{chain="did",nodeversion="{node_version}",services="{services}"}} {height}\n')
+        out.write(f'elastos_metrics_nodestate{{chain="did",rpcport="{int(rpcport)}",nodeversion="{node_version}",services="{services}"}} {height}\n')
 
 def handle_eth_sidechain(session):
     rpcport, _, _ = getConfigs("/etc/elastos-eth/params.env", chain="eth")
@@ -94,7 +113,28 @@ def handle_eth_sidechain(session):
     node_version = "0.1.2"
     services = "Ethereum Virtual Machine"
     with open("/data/elastos/metrics/prometheus/node-exporter/elastos-metrics.prom", "a") as out:
-        out.write(f'elastos_metrics_nodestate{{chain="eth",nodeversion="{node_version}",services="{services}"}} {height}\n')
+        out.write(f'elastos_metrics_nodestate{{chain="eth",rpcport="{int(rpcport)}",nodeversion="{node_version}",services="{services}"}} {height}\n')
+
+def handle_arbiter(session):
+    rpcport = "20536"
+    node_version = "5.2.3"
+    services = "Elastos Carrier Bootstrap Node"
+    with open("/data/elastos/metrics/prometheus/node-exporter/elastos-metrics.prom", "a") as out:
+        out.write(f'elastos_metrics_nodestate{{node="arbiter",rpcport="{int(rpcport)}",nodeversion="{node_version}",services="{services}"}} 1\n')
+
+def handle_carrier_bootstrap(session):
+    port = "33445"
+    node_version = "5.2.3"
+    services = "Elastos Carrier Bootstrap Node"
+    with open("/data/elastos/metrics/prometheus/node-exporter/elastos-metrics.prom", "a") as out:
+        out.write(f'elastos_metrics_nodestate{{node="carrier",port="{int(port)}",nodeversion="{node_version}",services="{services}"}} 1\n')
+
+def handle_metrics(session):
+    port, user, password = getConfigs("/etc/elastos-metrics/params.env", chain="metrics")
+    node_version = "1.5.0"
+    services = "Elastos Metrics Node"
+    with open("/data/elastos/metrics/prometheus/node-exporter/elastos-metrics.prom", "a") as out:
+        out.write(f'elastos_metrics_nodestate{{node="metrics",port="{int(port)}",nodeversion="{node_version}",services="{services}"}} 1\n')
 
 def getProducerInfo(session, rpcport, rpcuser, rpcpassword, nodekey):
     producer = {}
@@ -146,7 +186,7 @@ def getConfigs(config_file, chain="main"):
             config_data = json.load(f)["Configuration"]
         elif chain == "did":
             config_data = json.load(f)
-        elif chain == "eth":
+        elif chain == "eth" or chain == "metrics":
             config_data = {}
             for line in f:
                 key, val = line.partition("=")[::2]
@@ -168,9 +208,17 @@ def getConfigs(config_file, chain="main"):
         rpcpassword = config_data["RPCPass"]
     elif chain == "eth":
         try:
-            rpcport = config_data["RPCPort"]
+            rpcport = config_data["RPCPort"].rstrip().strip('"')
         except KeyError:
             rpcport = 20636
+            rpcuser, rpcpassword = '', ''
+    elif chain == "metrics":
+        try:
+            rpcport = config_data["PORT"].rstrip().strip('"')
+            rpcuser = config_data["AUTH_USER"].rstrip()
+            rpcpassword = config_data["AUTH_PASSWORD"].rstrip()
+        except KeyError:
+            rpcport = 5000
             rpcuser, rpcpassword = '', ''
     return rpcport, rpcuser, rpcpassword
 
