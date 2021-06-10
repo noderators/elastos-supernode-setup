@@ -70,7 +70,6 @@ echo ""
 echo "Downloading packages required for Elastos Supernode"
 DEPS=( "elastos-ela" "elastos-did" "elastos-eth" "elastos-arbiter" "elastos-carrier-bootstrap" "elastos-metrics" )
 VERSIONS=( "0.7.0-2" "0.3.1-1" "0.1.2-1" "0.2.1-1" "5.2.3-3" "1.4.0-1" )
-'''
 for i in "${!DEPS[@]}"
 do 
   echo "Downloading ${DEPS[$i]} Version: ${VERSIONS[$i]}"
@@ -85,17 +84,6 @@ do
     echo "${DEPS[$i]} is already the latest version with Version: ${VERSIONS[$i]}"
   fi
 done
-'''
-
-# TODO: Delete before git push
-DEB_DIRECTORY="/home/kpachhai/repos/github.com/noderators/elastos-supernode-setup"
-dpkg -i --force-confnew ${DEB_DIRECTORY}/ela/elastos-ela_0.7.0-2.deb
-dpkg -i --force-confnew ${DEB_DIRECTORY}/did/elastos-did_0.3.1-1.deb
-dpkg -i --force-confnew ${DEB_DIRECTORY}/eth/elastos-eth_0.1.2-1.deb
-dpkg -i --force-confnew ${DEB_DIRECTORY}/arbiter/elastos-arbiter_0.2.1-1.deb
-dpkg -i --force-confnew ${DEB_DIRECTORY}/carrier/elastos-carrier-bootstrap_5.2.3-3.deb
-dpkg -i --force-confnew ${DEB_DIRECTORY}/metrics/elastos-metrics_1.4.0-1.deb
-apt-get install -f
 
 # If this is the first time installing packages, we wanna make sure to copy required info from config files 
 # from the packages that were just installed
