@@ -59,6 +59,10 @@ then
   cp /data/elastos/eth/data/keystore/miner-keystore.dat eth_miner_keystore.dat; cp /data/elastos/eth/data/keystore/miner-keystore.dat /data/elastos/backup/${NOW}/miner-keystore.dat
   cp /etc/elastos-eth/params.env eth_params.env; cp /etc/elastos-eth/params.env /data/elastos/backup/${NOW}/eth_params.env
   cp /data/elastos/arbiter/config.json arbiter_config.json; cp /data/elastos/arbiter/config.json /data/elastos/backup/${NOW}/arbiter_config.json
+  if [ ! -f /data/elastos/arbiter/keystore.dat ]
+  then 
+    cp /data/elastos/ela/keystore.dat /data/elastos/arbiter/keystore.dat
+  fi
   cp /data/elastos/arbiter/keystore.dat arbiter_keystore.dat; cp /data/elastos/arbiter/keystore.dat /data/elastos/backup/${NOW}/arbiter_keystore.dat
   cp /etc/elastos-metrics/params.env metrics_params.env; cp /etc/elastos-metrics/params.env /data/elastos/backup/${NOW}/metrics_params.env
   cp /data/elastos/metrics/conf/prometheus.yml prometheus.yml; cp /data/elastos/metrics/conf/prometheus.yml /data/elastos/backup/${NOW}/prometheus.yml
@@ -70,6 +74,7 @@ echo ""
 echo "Downloading packages required for Elastos Supernode"
 DEPS=( "elastos-ela" "elastos-did" "elastos-eth" "elastos-arbiter" "elastos-carrier-bootstrap" "elastos-metrics" )
 VERSIONS=( "0.7.0-2" "0.3.1-1" "0.1.2-1" "0.2.1-1" "5.2.3-3" "1.4.0-1" )
+'''
 for i in "${!DEPS[@]}"
 do 
   echo "Downloading ${DEPS[$i]} Version: ${VERSIONS[$i]}"
@@ -84,6 +89,17 @@ do
     echo "${DEPS[$i]} is already the latest version with Version: ${VERSIONS[$i]}"
   fi
 done
+'''
+
+# TODO: Delete before git push
+DEB_DIRECTORY="/home/kpachhai/repos/github.com/noderators/elastos-supernode-setup"
+dpkg -i --force-confnew ${DEB_DIRECTORY}/ela/elastos-ela_0.7.0-2.deb
+dpkg -i --force-confnew ${DEB_DIRECTORY}/did/elastos-did_0.3.1-1.deb
+dpkg -i --force-confnew ${DEB_DIRECTORY}/eth/elastos-eth_0.1.2-1.deb
+dpkg -i --force-confnew ${DEB_DIRECTORY}/arbiter/elastos-arbiter_0.2.1-1.deb
+dpkg -i --force-confnew ${DEB_DIRECTORY}/carrier/elastos-carrier-bootstrap_5.2.3-3.deb
+dpkg -i --force-confnew ${DEB_DIRECTORY}/metrics/elastos-metrics_1.4.0-1.deb
+apt-get install -f
 
 # If this is the first time installing packages, we wanna make sure to copy required info from config files 
 # from the packages that were just installed
@@ -99,6 +115,10 @@ then
   cp /data/elastos/eth/data/keystore/miner-keystore.dat eth_miner_keystore.dat; cp /data/elastos/eth/data/keystore/miner-keystore.dat /data/elastos/backup/${NOW}/miner-keystore.dat
   cp /etc/elastos-eth/params.env eth_params.env; cp /etc/elastos-eth/params.env /data/elastos/backup/${NOW}/eth_params.env
   cp /data/elastos/arbiter/config.json arbiter_config.json; cp /data/elastos/arbiter/config.json /data/elastos/backup/${NOW}/arbiter_config.json
+  if [ ! -f /data/elastos/arbiter/keystore.dat ]
+  then 
+    cp /data/elastos/ela/keystore.dat /data/elastos/arbiter/keystore.dat
+  fi
   cp /data/elastos/arbiter/keystore.dat arbiter_keystore.dat; cp /data/elastos/arbiter/keystore.dat /data/elastos/backup/${NOW}/arbiter_keystore.dat
   cp /etc/elastos-metrics/params.env metrics_params.env; cp /etc/elastos-metrics/params.env /data/elastos/backup/${NOW}/metrics_params.env
   cp /data/elastos/metrics/conf/prometheus.yml prometheus.yml; cp /data/elastos/metrics/conf/prometheus.yml /data/elastos/backup/${NOW}/prometheus.yml
@@ -285,6 +305,9 @@ else
   usr=$(cat metrics_params.env | grep AUTH_USER | sed 's#.*AUTH_USER=##g' | sed 's#"##g')
   pswd=$(cat metrics_params.env | grep AUTH_PASSWORD | sed 's#.*AUTH_PASSWORD=##g' | sed 's#"##g')
 fi 
+if [[ ${port} = null ]] || [[ -z ${port} ]]; then port="5000"; fi
+if [[ ${usr} = null ]]; then usr="user"; fi
+if [[ ${pswd} = null ]]; then pswd="password"; fi
 sed -i "s#PORT=.*#PORT=\"${port}\"#g" /etc/elastos-metrics/params.env
 sed -i "s#AUTH_USER=.*#AUTH_USER=\"${usr}\"#g" /etc/elastos-metrics/params.env
 sed -i "s#AUTH_PASSWORD=.*#AUTH_PASSWORD=\"${pswd}\"#g" /etc/elastos-metrics/params.env
@@ -316,6 +339,11 @@ else
   smtp_auth_username=$(cat alertmanager.yml | grep smtp_auth_username | sed 's#.*smtp_auth_username: ##g' | sed 's#"##g')
   smtp_auth_password=$(cat alertmanager.yml | grep smtp_auth_password | sed 's#.*smtp_auth_password: ##g' | sed 's#"##g')
 fi 
+if [[ ${smtp_smarthost} = null ]] || [[ -z ${smtp_smarthost} ]]; then smtp_smarthost="localhost:25"; fi
+if [[ ${smtp_from} = null ]] || [[ -z ${smtp_from} ]]; then smtp_from="smtp_from@noderators.org"; fi
+if [[ ${smtp_to} = null ]] || [[ -z ${smtp_to} ]]; then smtp_to="smtp_to@noderators.org"; fi
+if [[ ${smtp_auth_username} = null ]]; then smtp_auth_username=""; fi
+if [[ ${smtp_auth_password} = null ]]; then smtp_auth_password=""; fi
 sed -i "s#smtp_smarthost:.*#smtp_smarthost: \"${smtp_smarthost}\"#g" /data/elastos/metrics/conf/alertmanager.yml
 sed -i "s#smtp_from:.*#smtp_from: \"${smtp_from}\"#g" /data/elastos/metrics/conf/alertmanager.yml
 sed -i "s#smtp_auth_username:.*#smtp_auth_username: \"${smtp_auth_username}\"#g" /data/elastos/metrics/conf/alertmanager.yml
@@ -357,4 +385,4 @@ do
   height=$(curl -X POST http://localhost:${port} -H 'Content-Type: application/json' -d '{"method":"eth_blockNumber", "id":1}' | jq -r ".result")
   if [[ ${height} != null ]] && [[ ! -z "${height}" ]]; then status="ready"; else sleep 5; fi
 done
-systemctl restart elastos-arbiter 
+systemctl restart elastos-arbiter
