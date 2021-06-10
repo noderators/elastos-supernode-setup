@@ -40,7 +40,7 @@ build_deb_package arbiter elastos-arbiter 0.2.1-1
 
 build_deb_package carrier elastos-carrier-bootstrap 5.2.3-3
 
-build_deb_package metrics elastos-metrics 1.4.0-1
+build_deb_package metrics elastos-metrics 1.5.0-1
 
 cd $CURR_DIR
 

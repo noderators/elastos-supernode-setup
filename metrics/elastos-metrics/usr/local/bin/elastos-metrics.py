@@ -18,6 +18,30 @@ def main():
     session.headers.update(HEADERS)
 
     # Main chain Node State
+    try:
+        handle_mainchain(session)
+    except:
+        pass
+
+    # DPoS Node Info
+    try:
+        handle_dpos(session)
+    except:
+        pass
+
+    # DID Sidechain Node State
+    try:
+        handle_did_sidechain(session)
+    except:
+        pass
+
+    # Smart Contract Sidechain(ETH) Node State 
+    try:
+        handle_eth_sidechain(session)
+    except:
+        pass 
+    
+def handle_mainchain(session):
     rpcport, rpcuser, rpcpassword = getConfigs("/data/elastos/ela/config.json", chain="main")
     node_state = getNodeState(session, rpcport, rpcuser=rpcuser, rpcpassword=rpcpassword)
     height = node_state["height"]
@@ -26,8 +50,9 @@ def main():
     with open("/data/elastos/metrics/prometheus/node-exporter/elastos-metrics.prom", "w") as out:
         out.write(f'elastos_metrics_nodestate{{chain="main",nodeversion="{node_version}",services="{services}"}} {height}\n')
 
-    # DPoS Node Info
+def handle_dpos(session):
     nodekey = getNodeKeyFromKeystoreFile()
+    rpcport, rpcuser, rpcpassword = getConfigs("/data/elastos/ela/config.json", chain="main")
     producer = getProducerInfo(session, rpcport, rpcuser, rpcpassword, nodekey) 
     if producer:
         producer_ownerpublickey = producer["ownerpublickey"]
@@ -53,7 +78,7 @@ def main():
             out.write(f'elastos_metrics_dpos_inactiveheight{{nickname="{producer_nickname}",ownerpublickey="{producer_ownerpublickey}",nodepublickey="{producer_nodepublickey}"}} {producer_inactiveheight}\n')
             out.write(f'elastos_metrics_dpos_illegalheight{{nickname="{producer_nickname}",ownerpublickey="{producer_ownerpublickey}",nodepublickey="{producer_nodepublickey}"}} {producer_illegalheight}\n')
 
-    # DID Sidechain Node State
+def handle_did_sidechain(session):
     rpcport, rpcuser, rpcpassword = getConfigs("/data/elastos/did/config.json", chain="did")
     node_state = getNodeState(session, rpcport, rpcuser=rpcuser, rpcpassword=rpcpassword)
     height = node_state["height"]
@@ -62,7 +87,7 @@ def main():
     with open("/data/elastos/metrics/prometheus/node-exporter/elastos-metrics.prom", "a") as out:
         out.write(f'elastos_metrics_nodestate{{chain="did",nodeversion="{node_version}",services="{services}"}} {height}\n')
 
-    # Smart Contract Sidechain(ETH) Node State 
+def handle_eth_sidechain(session):
     rpcport, _, _ = getConfigs("/etc/elastos-eth/params.env", chain="eth")
     node_state = getNodeState(session, rpcport, ethchain=True)
     height = node_state["height"]
@@ -103,11 +128,14 @@ def getNodeState(session, rpcport, rpcuser=None, rpcpassword=None, ethchain=Fals
         d = {"method":"eth_blockNumber", "id":1}
     else: 
         d = {"method":"getnodestate"}
-    if rpcuser and rpcpassword:
-        response = session.post(url, data=json.dumps(d), auth=(rpcuser, rpcpassword))
-    else:
-        response = session.post(url, data=json.dumps(d))
-    data = json.loads(response.text)["result"]
+    try:
+        if rpcuser and rpcpassword:
+            response = session.post(url, data=json.dumps(d), auth=(rpcuser, rpcpassword))
+        else:
+            response = session.post(url, data=json.dumps(d))
+        data = json.loads(response.text)["result"]
+    except:
+        return {}
     if ethchain:
         data = {"height": int(data, 16)}
     return data

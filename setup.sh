@@ -44,6 +44,10 @@ do
     apt-get install ${dep} -y
   fi
 done
+# Remove token sidechain stuff as it's no longer needed to be run
+apt-get remove elastos-token; rm -rf /data/elastos/token 
+# Remove ioex node as it's no longer supported
+apt-get remove ioex-mainchain; rm -rf /data/ioex
 
 # Make sure to backup important config files and wallets before proceeding just in case something goes wrong
 if [ -f /data/elastos/ela/keystore.dat ]
@@ -73,7 +77,8 @@ fi
 echo ""
 echo "Downloading packages required for Elastos Supernode"
 DEPS=( "elastos-ela" "elastos-did" "elastos-eth" "elastos-arbiter" "elastos-carrier-bootstrap" "elastos-metrics" )
-VERSIONS=( "0.7.0-2" "0.3.1-1" "0.1.2-1" "0.2.1-1" "5.2.3-3" "1.4.0-1" )
+VERSIONS=( "0.7.0-2" "0.3.1-1" "0.1.2-1" "0.2.1-1" "5.2.3-3" "1.5.0-1" )
+'''
 for i in "${!DEPS[@]}"
 do 
   echo "Downloading ${DEPS[$i]} Version: ${VERSIONS[$i]}"
@@ -82,12 +87,23 @@ do
   if [ $(echo $?) -ne "0" ]
   then 
     echo "Installing ${DEPS[$i]} Version: ${VERSIONS[$i]}"
-    dpkg -i --force-confnew "${DEPS[$i]}_${VERSIONS[$i]}.deb"
+    dpkg -i --force-confmiss --force-confnew "${DEPS[$i]}_${VERSIONS[$i]}.deb"
     apt-get install -f
   else  
     echo "${DEPS[$i]} is already the latest version with Version: ${VERSIONS[$i]}"
   fi
 done
+'''
+
+# TODO: Delete before git push
+DEB_DIRECTORY="/home/kpachhai/repos/github.com/noderators/elastos-supernode-setup"
+dpkg -i --force-confmiss --force-confnew ${DEB_DIRECTORY}/ela/elastos-ela_0.7.0-2.deb
+dpkg -i --force-confmiss --force-confnew ${DEB_DIRECTORY}/did/elastos-did_0.3.1-1.deb
+dpkg -i --force-confmiss --force-confnew ${DEB_DIRECTORY}/eth/elastos-eth_0.1.2-1.deb
+dpkg -i --force-confmiss --force-confnew ${DEB_DIRECTORY}/arbiter/elastos-arbiter_0.2.1-1.deb
+dpkg -i --force-confmiss --force-confnew ${DEB_DIRECTORY}/carrier/elastos-carrier-bootstrap_5.2.3-3.deb
+dpkg -i --force-confmiss --force-confnew ${DEB_DIRECTORY}/metrics/elastos-metrics_1.5.0-1.deb
+apt-get install -f
 
 # If this is the first time installing packages, we wanna make sure to copy required info from config files 
 # from the packages that were just installed
@@ -116,7 +132,7 @@ fi
 # Create a new wallet for ELA mainchain node or do nothing depending on what the user wants to do
 echo ""
 echo "Personalizing your Elastos Supernode setup"
-read -p "WARNING! You're trying to create a new wallet. This may replace your previous wallet if it exists already. Proceed? [y/N] " answer
+read -p "WARNING! You're trying to create a new wallet for ELA mainchain node. This may replace your previous wallet if it exists already. Proceed? [y/N] " answer
 if [[ "${answer}" == "y" ]] || [[ "${answer}" == "Y" ]] || [[ "${answer}" == "yes" ]]
 then 
   rm -f /data/elastos/ela/keystore.dat 
@@ -136,6 +152,40 @@ else
   cp arbiter_keystore.dat /data/elastos/arbiter/keystore.dat
 fi
 chmod 644 /data/elastos/ela/keystore.dat
+
+# Create a new secondary wallet for DID sidechain node on Arbiter node if it doesn't exist
+echo ""
+pswd=$(cat /etc/elastos-ela/params.env | grep KEYSTORE_PASSWORD | sed 's#.*KEYSTORE_PASSWORD=##g' | sed 's#"##g')
+# Check to make sure whether the keystore.dat of ELA mainchain node and Arbiter node match
+cp /data/elastos/arbiter/keystore.dat .
+NUM_WALLETS=$(elastos-ela-cli wallet a -p ${pswd} | grep - | wc -l)
+NUM_WALLETS=$(expr ${NUM_WALLETS} - 1)
+ELA_ADDRESS=$(cat /data/elastos/ela/keystore.dat | jq -r ".Account[0].Address")
+if [[ "${ELA_ADDRESS}" != "$(cat /data/elastos/arbiter/keystore.dat | jq -r ".Account[0].Address")" ]]
+then 
+  if [[ "${NUM_WALLETS}" -gt "2" ]] || [[ "${NUM_WALLETS}" -lt "2" ]]
+  then 
+    cp /data/elastos/ela/keystore.dat .
+    NUM_WALLETS=1
+  elif [[ "${NUM_WALLETS}" -eq "2" ]] 
+  then 
+    if [[ "${ELA_ADDRESS}" != "$(cat /data/elastos/arbiter/keystore.dat | jq -r ".Account[1].Address")" ]]
+    then 
+      cp /data/elastos/ela/keystore.dat .
+      NUM_WALLETS=1
+    fi
+  fi 
+fi 
+if [[ "${NUM_WALLETS}" -eq "1" ]]
+then
+  echo ""
+  echo "Creating a secondary account for Arbiter node that will be used for did block generation"
+  chown $USER:$USER keystore.dat
+  /usr/local/bin/elastos-ela-cli wallet add -p ${pswd}
+  cp keystore.dat /data/elastos/arbiter/keystore.dat
+  chown elauser:elauser /data/elastos/arbiter/keystore.dat 
+fi
+chmod 644 /data/elastos/arbiter/keystore.dat
 
 # Configure all the configs for RPC and miner info for ELA mainchain node
 echo ""
@@ -202,6 +252,12 @@ cat <<< $(jq ".Configuration.SideNodeList[0].Rpc.HttpJsonPort = ${port}" /data/e
 cat <<< $(jq ".Configuration.SideNodeList[0].Rpc.User = \"${usr}\"" /data/elastos/arbiter/config.json) > /data/elastos/arbiter/config.json
 cat <<< $(jq ".Configuration.SideNodeList[0].Rpc.Pass = \"${pswd}\"" /data/elastos/arbiter/config.json) > /data/elastos/arbiter/config.json
 cat <<< $(jq ".Configuration.SideNodeList[0].PayToAddr = \"${elaaddr}\"" /data/elastos/arbiter/config.json) > /data/elastos/arbiter/config.json
+mining_address=$(cat /data/elastos/arbiter/keystore.dat | jq -r ".Account[0].Address")
+if [[ "$(cat /data/elastos/arbiter/keystore.dat | jq -r ".Account[0].Type")" != "sub-account" ]]
+then 
+  mining_address=$(cat /data/elastos/arbiter/keystore.dat | jq -r ".Account[1].Address")
+fi
+cat <<< $(jq ".Configuration.SideNodeList[0].MiningAddr = \"${mining_address}\"" /data/elastos/arbiter/config.json) > /data/elastos/arbiter/config.json
 
 # Configure all the configs for Smart Contract sidechain(ETH) node such as creating miner wallet if it 
 # does not exist 
@@ -227,15 +283,18 @@ read -p "Would you like to change the current info for RPC configuration and/or 
 if [[ "${answer}" == "y" ]] || [[ "${answer}" == "Y" ]] || [[ "${answer}" == "yes" ]]
 then
   read -p "Enter the port you would like to set for RPC configuration: " port
+  read -p "Enter the ETH address you would like to set for miner fees payout: " elaaddr
 else 
   port=$(cat eth_params.env | grep RPCPORT | sed 's#.*RPCPORT=##g' | sed 's#"##g')
+  elaaddr=$(echo 0x$(cat /data/elastos/eth/data/keystore/miner-keystore.dat | jq -r .address))
 fi
 if [[ ${port} = null ]] || [[ -z ${port} ]]; then port="20636"; fi
+if [[ ${elaaddr} = null ]] || [[ -z ${elaaddr} ]]; then elaaddr="0xD1B12D68851Dcac6bfF3855dEaEaF5C7bd11aDdA"; fi
 sed -i "s#RPCPORT=.*#RPCPORT=\"${port}\"#g" /etc/elastos-eth/params.env
-cat <<< $(jq ".Configuration.SideNodeList[1].Rpc.HttpJsonPort = ${port}" /data/elastos/arbiter/config.json) > /data/elastos/arbiter/config.json
+cat <<< $(jq ".Configuration.SideNodeList[1].PayToAddr = \"${elaaddr}\"" /data/elastos/arbiter/config.json) > /data/elastos/arbiter/config.json
 unlock_address=$(echo 0x$(cat /data/elastos/eth/data/keystore/miner-keystore.dat | jq -r .address))
 sed -i "s#UNLOCK_ADDRESS=.*#UNLOCK_ADDRESS=\"${unlock_address}\"#g" /etc/elastos-eth/params.env
-cat <<< $(jq ".Configuration.SideNodeList[1].PayToAddr = \"${unlock_address}\"" /data/elastos/arbiter/config.json) > /data/elastos/arbiter/config.json
+cat <<< $(jq ".Configuration.SideNodeList[1].MiningAddr = \"${unlock_address}\"" /data/elastos/arbiter/config.json) > /data/elastos/arbiter/config.json
 ipaddress=$(curl ifconfig.me)
 sed -i "s#IPADDRESS=.*#IPADDRESS=\"${ipaddress}\"#g" /etc/elastos-eth/params.env
 cd /data/elastos/eth/oracle
@@ -258,21 +317,6 @@ if [[ ${usr} = null ]]; then usr=""; fi
 if [[ ${pswd} = null ]]; then pswd=""; fi
 cat <<< $(jq ".Configuration.RpcConfiguration.User = \"${usr}\"" /data/elastos/arbiter/config.json) > /data/elastos/arbiter/config.json
 cat <<< $(jq ".Configuration.RpcConfiguration.Pass = \"${pswd}\"" /data/elastos/arbiter/config.json) > /data/elastos/arbiter/config.json
-# Creating a secondary wallet if it doesn't exist
-pswd=$(cat /etc/elastos-ela/params.env | grep KEYSTORE_PASSWORD | sed 's#.*KEYSTORE_PASSWORD=##g' | sed 's#"##g')
-cp /data/elastos/arbiter/keystore.dat .
-NUM_WALLETS=$(elastos-ela-cli wallet a -p ${pswd} | grep - | wc -l)
-NUM_WALLETS=$(expr ${NUM_WALLETS} - 1)
-if [ "${NUM_WALLETS}" -lt "2" ]
-then
-  echo ""
-  echo "Creating a secondary account for Arbiter node that will be used for did block generation"
-  chown $USER:$USER keystore.dat
-  /usr/local/bin/elastos-ela-cli wallet add -p ${pswd}
-  cp keystore.dat /data/elastos/arbiter/keystore.dat
-  chown elauser:elauser /data/elastos/arbiter/keystore.dat 
-fi
-chmod 644 /data/elastos/arbiter/keystore.dat
 
 # Configure all the configs for Carrier Bootstrap node
 echo ""

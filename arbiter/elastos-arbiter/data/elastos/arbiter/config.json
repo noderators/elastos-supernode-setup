@@ -26,7 +26,7 @@
       {
         "Rpc": {
           "IpAddress": "localhost",
-          "HttpJsonPort": 20636,
+          "HttpJsonPort": 20632,
           "User": "",
           "Pass": ""
         },

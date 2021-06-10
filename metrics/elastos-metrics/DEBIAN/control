@@ -1,6 +1,6 @@
 Package: elastos-metrics
 Source: noderators
-Version: 1.4.0-1
+Version: 1.5.0-1
 Architecture: amd64
 Maintainer: Kiran Pachhai <kiran.pachhai@gmail.com>
 Pre-Depends: adduser
