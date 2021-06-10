@@ -67,7 +67,7 @@ def handle_mainchain(session):
     node_version = node_state["compile"]
     services = node_state["services"]
     with open("/data/elastos/metrics/prometheus/node-exporter/elastos-metrics.prom", "w") as out:
-        out.write(f'elastos_metrics_nodestate{{chain="main",rpcport="{int(rpcport)}",nodeversion="{node_version}",services="{services}"}} {height}\n')
+        out.write(f'elastos_metrics_nodestate{{chain="main",node="mainchain",port="{int(rpcport)}",rpcport="{int(rpcport)}",nodeversion="{node_version}",services="{services}"}} {height}\n')
 
 def handle_dpos(session):
     nodekey = getNodeKeyFromKeystoreFile()
@@ -104,7 +104,7 @@ def handle_did_sidechain(session):
     node_version = node_state["compile"]
     services = node_state["services"]
     with open("/data/elastos/metrics/prometheus/node-exporter/elastos-metrics.prom", "a") as out:
-        out.write(f'elastos_metrics_nodestate{{chain="did",rpcport="{int(rpcport)}",nodeversion="{node_version}",services="{services}"}} {height}\n')
+        out.write(f'elastos_metrics_nodestate{{chain="did",node="did-sidechain",port="{int(rpcport)}",rpcport="{int(rpcport)}",nodeversion="{node_version}",services="{services}"}} {height}\n')
 
 def handle_eth_sidechain(session):
     rpcport, _, _ = getConfigs("/etc/elastos-eth/params.env", chain="eth")
@@ -113,28 +113,28 @@ def handle_eth_sidechain(session):
     node_version = "0.1.2"
     services = "Ethereum Virtual Machine"
     with open("/data/elastos/metrics/prometheus/node-exporter/elastos-metrics.prom", "a") as out:
-        out.write(f'elastos_metrics_nodestate{{chain="eth",rpcport="{int(rpcport)}",nodeversion="{node_version}",services="{services}"}} {height}\n')
+        out.write(f'elastos_metrics_nodestate{{chain="eth",node="eth-sidechain",port="{int(rpcport)}",rpcport="{int(rpcport)}",nodeversion="{node_version}",services="{services}"}} {height}\n')
 
 def handle_arbiter(session):
     rpcport = "20536"
-    node_version = "5.2.3"
+    node_version = "0.2.1"
     services = "Elastos Carrier Bootstrap Node"
     with open("/data/elastos/metrics/prometheus/node-exporter/elastos-metrics.prom", "a") as out:
-        out.write(f'elastos_metrics_nodestate{{node="arbiter",rpcport="{int(rpcport)}",nodeversion="{node_version}",services="{services}"}} 1\n')
+        out.write(f'elastos_metrics_nodestate{{chain="crosschain",node="arbiter",port="{int(rpcport)}",rpcport="{int(rpcport)}",nodeversion="{node_version}",services="{services}"}} 1\n')
 
 def handle_carrier_bootstrap(session):
     port = "33445"
     node_version = "5.2.3"
     services = "Elastos Carrier Bootstrap Node"
     with open("/data/elastos/metrics/prometheus/node-exporter/elastos-metrics.prom", "a") as out:
-        out.write(f'elastos_metrics_nodestate{{node="carrier",port="{int(port)}",nodeversion="{node_version}",services="{services}"}} 1\n')
+        out.write(f'elastos_metrics_nodestate{{chain="carrier",node="carrier",port="{int(port)}",rpcport="{int(port)}",nodeversion="{node_version}",services="{services}"}} 1\n')
 
 def handle_metrics(session):
     port, user, password = getConfigs("/etc/elastos-metrics/params.env", chain="metrics")
     node_version = "1.5.0"
     services = "Elastos Metrics Node"
     with open("/data/elastos/metrics/prometheus/node-exporter/elastos-metrics.prom", "a") as out:
-        out.write(f'elastos_metrics_nodestate{{node="metrics",port="{int(port)}",nodeversion="{node_version}",services="{services}"}} 1\n')
+        out.write(f'elastos_metrics_nodestate{{chain="metrics",node="metrics",port="{int(port)}",rpcport="{int(port)}",nodeversion="{node_version}",services="{services}"}} 1\n')
 
 def getProducerInfo(session, rpcport, rpcuser, rpcpassword, nodekey):
     producer = {}
