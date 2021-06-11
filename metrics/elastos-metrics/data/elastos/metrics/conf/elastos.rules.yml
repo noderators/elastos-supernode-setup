@@ -9,4 +9,4 @@ groups:
       severity: critical
     annotations:
       summary: "Elastos Blockchain not growing (instance {{ $labels.instance }}, chain {{ $labels.chain }})"
-    description: "Height has not been growing for at least an hour\n  LABELS: {{ $labels }}"
+      description: "Height has not been growing for at least an hour\n  LABELS: {{ $labels }}"
