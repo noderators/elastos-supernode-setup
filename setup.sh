@@ -33,7 +33,7 @@ echo "Updating the system packages"
 apt-get update -y 
 echo "Installing third party tools and dependencies"
 curl -sL https://deb.nodesource.com/setup_12.x | sudo -E bash -
-apt-get install -y python3 python3-pip nodejs || stop_script "Cannot install third party tools and dependencies"
+apt-get install -y python3 python3-pip nodejs jq || stop_script "Cannot install third party tools and dependencies"
 echo "Installing dependencies for Elastos Supernode if not installed"
 DEPS=( "prometheus" "prometheus-node-exporter" "prometheus-pushgateway" "prometheus-alertmanager" )
 for dep in "${DEPS[@]}"
@@ -77,7 +77,7 @@ fi
 echo ""
 echo "Downloading packages required for Elastos Supernode"
 DEPS=( "elastos-ela" "elastos-did" "elastos-eth" "elastos-arbiter" "elastos-carrier-bootstrap" "elastos-metrics" )
-VERSIONS=( "0.7.0-2" "0.3.1-1" "0.1.2-1" "0.2.1-1" "5.2.3-3" "1.5.0-1" )
+VERSIONS=( "0.7.0-2" "0.3.1-1" "0.1.2-1" "0.2.1-2" "5.2.3-3" "1.5.0-1" )
 for i in "${!DEPS[@]}"
 do 
   echo "Downloading ${DEPS[$i]} Version: ${VERSIONS[$i]}"
@@ -375,34 +375,4 @@ echo ""
 echo "Starting up all the services required for running the supernode"
 systemctl daemon-reload
 systemctl restart elastos-ela elastos-did elastos-eth elastos-eth-oracle elastos-carrier-bootstrap elastos-metrics prometheus prometheus-node-exporter prometheus-pushgateway prometheus-alertmanager
-
-# Make sure the nodes are healthy before starting up arbiter node
-# Check for mainchain node
-status=""
-while [[ ${status} != "ready" ]]
-do 
-  port=$(cat /data/elastos/ela/config.json | jq -r ".Configuration.HttpJsonPort")
-  usr=$(cat /data/elastos/ela/config.json | jq -r ".Configuration.RpcConfiguration.User")
-  pswd=$(cat /data/elastos/ela/config.json | jq -r ".Configuration.RpcConfiguration.Pass")
-  height=$(curl -X POST --user ${usr}:${pswd} http://localhost:${port} -H 'Content-Type: application/json' -d '{"method":"getnodestate"}' | jq ".result.height")
-  if [[ ${height} != null ]] && [[ ! -z "${height}" ]]; then status="ready"; else sleep 5; fi
-done
-# Check for did node
-status=""
-while [[ ${status} != "ready" ]]
-do 
-  port=$(cat /data/elastos/did/config.json | jq -r ".RPCPort")
-  usr=$(cat /data/elastos/did/config.json | jq -r ".RPCUser")
-  pswd=$(cat /data/elastos/did/config.json | jq -r ".RPCPass")
-  height=$(curl -X POST --user ${usr}:${pswd} http://localhost:${port} -H 'Content-Type: application/json' -d '{"method":"getnodestate"}' | jq ".result.height")
-  if [[ ${height} != null ]] && [[ ! -z "${height}" ]]; then status="ready"; else sleep 5; fi
-done
-# Check for eth node
-status=""
-while [[ ${status} != "ready" ]]
-do 
-  port=$(cat /etc/elastos-eth/params.env | grep RPCPORT | sed 's#.*RPCPORT=##g' | sed 's#"##g')
-  height=$(curl -X POST http://localhost:${port} -H 'Content-Type: application/json' -d '{"method":"eth_blockNumber", "id":1}' | jq -r ".result")
-  if [[ ${height} != null ]] && [[ ! -z "${height}" ]]; then status="ready"; else sleep 5; fi
-done
 systemctl restart elastos-arbiter
