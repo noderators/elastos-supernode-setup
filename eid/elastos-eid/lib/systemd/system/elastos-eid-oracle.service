@@ -1,0 +1,18 @@
+[Unit]
+Description=Elastos ID(EID) Sidechain Oracle Service
+After=network-online.target elastos-eid.service
+
+[Service]
+Type=simple
+WorkingDirectory=/data/elastos/eid/oracle
+EnvironmentFile=/etc/elastos-eid/params.env
+ExecStart=/usr/bin/node ${ORACLE_SERVICE_FILE} -i 1 \
+            -e ${ORACLE_ERR_FILE}                   \
+            -o ${ORACLE_OUTPUT_FILE}
+            
+User=elauser
+Group=elauser
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

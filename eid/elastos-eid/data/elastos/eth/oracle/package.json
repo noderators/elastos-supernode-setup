@@ -1,0 +1,17 @@
+{
+  "name": "elastos-eth-oracle",
+  "version": "1.0.0",
+  "description": "",
+  "main": "crosschain_oracle.js",
+  "dependencies": {
+    "express": "^4.16.0",
+    "web3": "^1.2.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "start": "node .",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Kiran Pachhai <kiran.pachhai@gmail.com>",
+  "license": "MIT"
+}

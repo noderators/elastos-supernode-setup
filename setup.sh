@@ -59,6 +59,9 @@ then
   cp /data/elastos/ela/keystore.dat mainchain_keystore.dat; cp /data/elastos/ela/keystore.dat /data/elastos/backup/${NOW}/mainchain_keystore.dat
   cp /data/elastos/ela/config.json mainchain_config.json; cp /data/elastos/ela/config.json /data/elastos/backup/${NOW}/mainchain_config.json
   cp /data/elastos/did/config.json did_config.json; cp /data/elastos/did/config.json /data/elastos/backup/${NOW}/did_config.json
+  cp /data/elastos/eid/keystore.dat eid_keystore.dat; cp /data/elastos/eid/keystore.dat /data/elastos/backup/${NOW}/eid_keystore.dat
+  cp /data/elastos/eid/data/keystore/miner-keystore.dat eid_miner_keystore.dat; cp /data/elastos/eid/data/keystore/miner-keystore.dat /data/elastos/backup/${NOW}/miner-keystore.dat
+  cp /etc/elastos-eid/params.env eid_params.env; cp /etc/elastos-eid/params.env /data/elastos/backup/${NOW}/eid_params.env
   cp /data/elastos/eth/keystore.dat eth_keystore.dat; cp /data/elastos/eth/keystore.dat /data/elastos/backup/${NOW}/eth_keystore.dat
   cp /data/elastos/eth/data/keystore/miner-keystore.dat eth_miner_keystore.dat; cp /data/elastos/eth/data/keystore/miner-keystore.dat /data/elastos/backup/${NOW}/miner-keystore.dat
   cp /etc/elastos-eth/params.env eth_params.env; cp /etc/elastos-eth/params.env /data/elastos/backup/${NOW}/eth_params.env
@@ -76,8 +79,8 @@ fi
 # Download all the noderators packages required for setting up Elastos Supernode
 echo ""
 echo "Downloading packages required for Elastos Supernode"
-DEPS=( "elastos-ela" "elastos-did" "elastos-eth" "elastos-arbiter" "elastos-carrier-bootstrap" "elastos-metrics" )
-VERSIONS=( "0.7.0-2" "0.3.1-1" "0.1.2-1" "0.2.1-2" "5.2.3-3" "1.5.0-1" )
+DEPS=( "elastos-ela" "elastos-did" "elastos-eid" "elastos-eth" "elastos-arbiter" "elastos-carrier-bootstrap" "elastos-metrics" )
+VERSIONS=( "0.7.0-2" "0.3.1-1" "0.1.0-1" "0.1.2-1" "0.2.1-2" "5.2.3-3" "1.5.0-1" )
 for i in "${!DEPS[@]}"
 do 
   echo "Downloading ${DEPS[$i]} Version: ${VERSIONS[$i]}"
@@ -103,6 +106,9 @@ then
   cp /data/elastos/ela/keystore.dat mainchain_keystore.dat; cp /data/elastos/ela/keystore.dat /data/elastos/backup/${NOW}/mainchain_keystore.dat
   cp /data/elastos/ela/config.json mainchain_config.json; cp /data/elastos/ela/config.json /data/elastos/backup/${NOW}/mainchain_config.json
   cp /data/elastos/did/config.json did_config.json; cp /data/elastos/did/config.json /data/elastos/backup/${NOW}/did_config.json
+  cp /data/elastos/eid/keystore.dat eid_keystore.dat; cp /data/elastos/eid/keystore.dat /data/elastos/backup/${NOW}/eid_keystore.dat
+  cp /data/elastos/eid/data/keystore/miner-keystore.dat eid_miner_keystore.dat; cp /data/elastos/eid/data/keystore/miner-keystore.dat /data/elastos/backup/${NOW}/miner-keystore.dat
+  cp /etc/elastos-eid/params.env eid_params.env; cp /etc/elastos-eid/params.env /data/elastos/backup/${NOW}/eid_params.env
   cp /data/elastos/eth/keystore.dat eth_keystore.dat; cp /data/elastos/eth/keystore.dat /data/elastos/backup/${NOW}/eth_keystore.dat
   cp /data/elastos/eth/data/keystore/miner-keystore.dat eth_miner_keystore.dat; cp /data/elastos/eth/data/keystore/miner-keystore.dat /data/elastos/backup/${NOW}/miner-keystore.dat
   cp /etc/elastos-eth/params.env eth_params.env; cp /etc/elastos-eth/params.env /data/elastos/backup/${NOW}/eth_params.env
@@ -136,6 +142,7 @@ then
   echo ${pswd} > ${keyword_password_file}
 else 
   cp mainchain_keystore.dat /data/elastos/ela/keystore.dat
+  cp eid_keystore.dat /data/elastos/eid/keystore.dat
   cp eth_keystore.dat /data/elastos/eth/keystore.dat
   cp arbiter_keystore.dat /data/elastos/arbiter/keystore.dat
 fi
@@ -236,18 +243,53 @@ cat <<< $(jq ".RPCUser = \"${usr}\"" /data/elastos/did/config.json) > /data/elas
 cat <<< $(jq ".RPCPass = \"${pswd}\"" /data/elastos/did/config.json) > /data/elastos/did/config.json
 cat <<< $(jq ".PayToAddr = \"${elaaddr}\"" /data/elastos/did/config.json) > /data/elastos/did/config.json
 cat <<< $(jq ".MinerInfo = \"${minername}\"" /data/elastos/did/config.json) > /data/elastos/did/config.json
-cat <<< $(jq ".Configuration.SideNodeList[0].Rpc.HttpJsonPort = ${port}" /data/elastos/arbiter/config.json) > /data/elastos/arbiter/config.json
-cat <<< $(jq ".Configuration.SideNodeList[0].Rpc.User = \"${usr}\"" /data/elastos/arbiter/config.json) > /data/elastos/arbiter/config.json
-cat <<< $(jq ".Configuration.SideNodeList[0].Rpc.Pass = \"${pswd}\"" /data/elastos/arbiter/config.json) > /data/elastos/arbiter/config.json
-cat <<< $(jq ".Configuration.SideNodeList[0].PayToAddr = \"${elaaddr}\"" /data/elastos/arbiter/config.json) > /data/elastos/arbiter/config.json
+cat <<< $(jq ".Configuration.SideNodeList[2].Rpc.HttpJsonPort = ${port}" /data/elastos/arbiter/config.json) > /data/elastos/arbiter/config.json
+cat <<< $(jq ".Configuration.SideNodeList[2].Rpc.User = \"${usr}\"" /data/elastos/arbiter/config.json) > /data/elastos/arbiter/config.json
+cat <<< $(jq ".Configuration.SideNodeList[2].Rpc.Pass = \"${pswd}\"" /data/elastos/arbiter/config.json) > /data/elastos/arbiter/config.json
+cat <<< $(jq ".Configuration.SideNodeList[2].PayToAddr = \"${elaaddr}\"" /data/elastos/arbiter/config.json) > /data/elastos/arbiter/config.json
 mining_address=$(cat /data/elastos/arbiter/keystore.dat | jq -r ".Account[0].Address")
 if [[ "$(cat /data/elastos/arbiter/keystore.dat | jq -r ".Account[0].Type")" != "sub-account" ]]
 then 
   mining_address=$(cat /data/elastos/arbiter/keystore.dat | jq -r ".Account[1].Address")
 fi
-cat <<< $(jq ".Configuration.SideNodeList[0].MiningAddr = \"${mining_address}\"" /data/elastos/arbiter/config.json) > /data/elastos/arbiter/config.json
+cat <<< $(jq ".Configuration.SideNodeList[2].MiningAddr = \"${mining_address}\"" /data/elastos/arbiter/config.json) > /data/elastos/arbiter/config.json
 
-# Configure all the configs for Smart Contract sidechain(ETH) node such as creating miner wallet if it 
+# Configure all the configs for Elastos ID(EID) sidechain node such as creating miner wallet if it 
+# does not exist 
+echo ""
+echo "Modifying the config file parameters for Elastos ID(EID) sidechain node"
+read -p "WARNING! You're trying to create a new eid miner wallet. This may replace your previous wallet if it exists already. Proceed? [y/N] " answer
+if [[ "${answer}" == "y" ]] || [[ "${answer}" == "Y" ]] || [[ "${answer}" == "yes" ]]
+then 
+  rm -f /data/elastos/eid/data/keystore/miner-keystore.dat
+  read -p "Enter the password for your miner-keystore.dat: " pswd
+  miner_password_file=$(cat /etc/elastos-eid/params.env | grep MINER_PASSWORD_FILE | sed 's#.*MINER_PASSWORD_FILE=##g' | sed 's#"##g')
+  echo ${pswd} > ${miner_password_file}
+  echo "Creating a eid miner wallet with the given password"
+  datadir=$(cat /etc/elastos-eid/params.env | grep DATADIR | sed 's#.*DATADIR=##g' | sed 's#"##g')
+  /usr/local/bin/elastos-eid --datadir ${datadir} account new --password ${miner_password_file}
+  mv /data/elastos/eid/data/keystore/UTC* /data/elastos/eid/data/keystore/miner-keystore.dat
+  chown elauser:elauser /data/elastos/eid/data/keystore/miner-keystore.dat 
+else 
+  cp eid_miner_keystore.dat /data/elastos/eid/data/keystore/miner-keystore.dat
+fi
+chmod 644 /data/elastos/eid/data/keystore/miner-keystore.dat
+read -p "Would you like to change the current info for RPC configuration and/or miner configuration for this node? [y/N] " answer
+if [[ "${answer}" == "y" ]] || [[ "${answer}" == "Y" ]] || [[ "${answer}" == "yes" ]]
+then
+  read -p "Enter the port you would like to set for RPC configuration: " port
+else 
+  port=$(cat eid_params.env | grep RPCPORT | sed 's#.*RPCPORT=##g' | sed 's#"##g')
+fi
+if [[ ${port} = null ]] || [[ -z ${port} ]]; then port="20736"; fi
+sed -i "s#RPCPORT=.*#RPCPORT=\"${port}\"#g" /etc/elastos-eid/params.env
+ipaddress=$(curl ifconfig.me)
+sed -i "s#IPADDRESS=.*#IPADDRESS=\"${ipaddress}\"#g" /etc/elastos-eid/params.env
+cd /data/elastos/eid/oracle
+npm install
+cd ${MYTMPDIR}
+
+# Configure all the configs for Elastos Smart Contract(ESC) sidechain node such as creating miner wallet if it 
 # does not exist 
 echo ""
 echo "Modifying the config file parameters for Smart Contract Sidechain(ETH) node"
@@ -274,15 +316,9 @@ then
   read -p "Enter the ETH address you would like to set for miner fees payout: " elaaddr
 else 
   port=$(cat eth_params.env | grep RPCPORT | sed 's#.*RPCPORT=##g' | sed 's#"##g')
-  elaaddr=$(echo 0x$(cat /data/elastos/eth/data/keystore/miner-keystore.dat | jq -r .address))
 fi
 if [[ ${port} = null ]] || [[ -z ${port} ]]; then port="20636"; fi
-if [[ ${elaaddr} = null ]] || [[ -z ${elaaddr} ]]; then elaaddr="0xD1B12D68851Dcac6bfF3855dEaEaF5C7bd11aDdA"; fi
 sed -i "s#RPCPORT=.*#RPCPORT=\"${port}\"#g" /etc/elastos-eth/params.env
-cat <<< $(jq ".Configuration.SideNodeList[1].PayToAddr = \"${elaaddr}\"" /data/elastos/arbiter/config.json) > /data/elastos/arbiter/config.json
-unlock_address=$(echo 0x$(cat /data/elastos/eth/data/keystore/miner-keystore.dat | jq -r .address))
-sed -i "s#UNLOCK_ADDRESS=.*#UNLOCK_ADDRESS=\"${unlock_address}\"#g" /etc/elastos-eth/params.env
-cat <<< $(jq ".Configuration.SideNodeList[1].MiningAddr = \"${unlock_address}\"" /data/elastos/arbiter/config.json) > /data/elastos/arbiter/config.json
 ipaddress=$(curl ifconfig.me)
 sed -i "s#IPADDRESS=.*#IPADDRESS=\"${ipaddress}\"#g" /etc/elastos-eth/params.env
 cd /data/elastos/eth/oracle
@@ -374,5 +410,5 @@ sed -i "s#to:.*#to: \"${smtp_to}\"#g" /data/elastos/metrics/conf/alertmanager.ym
 echo ""
 echo "Starting up all the services required for running the supernode"
 systemctl daemon-reload
-systemctl restart elastos-ela elastos-did elastos-eth elastos-eth-oracle elastos-carrier-bootstrap elastos-metrics prometheus prometheus-node-exporter prometheus-pushgateway prometheus-alertmanager
+systemctl restart elastos-ela elastos-did elastos-eid elastos-eid-oracle elastos-eth elastos-eth-oracle elastos-carrier-bootstrap elastos-metrics prometheus prometheus-node-exporter prometheus-pushgateway prometheus-alertmanager
 systemctl restart elastos-arbiter

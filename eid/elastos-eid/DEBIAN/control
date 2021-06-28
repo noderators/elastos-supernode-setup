@@ -1,0 +1,14 @@
+Package: elastos-eid
+Source: noderators
+Version: 0.1.0-1
+Architecture: amd64
+Maintainer: Kiran Pachhai <kiran.pachhai@gmail.com>
+Pre-Depends: adduser
+Depends: libsystemd0
+Homepage: http://www.elastos.org/
+Description: Elastos ID Sidechain Node (daemon)
+ Elastos ID Sidechain is used to connect to the elastos decentralized
+ ID sidechain peer to peer network. This package contains the elastos 
+ DID sidechain node daemon. Use this to connect to other peer nodes in 
+ the network.
+ 
