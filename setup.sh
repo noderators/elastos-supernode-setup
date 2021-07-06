@@ -50,21 +50,14 @@ apt-get remove elastos-token -y; rm -rf /data/elastos/token
 apt-get remove ioex-mainchain -y; rm -rf /data/ioex
 
 # Make sure to backup important config files and wallets before proceeding just in case something goes wrong
+NOW=$(date +"%Y-%m-%dT%H:%M:%S")
 if [ -f /data/elastos/ela/keystore.dat ]
 then
-  PREVIOUS_INSTALL="yes"
-  # Let's backup these files just in case the user does not want to change any settings with the new release
-  NOW=$(date +"%Y-%m-%dT%H:%M:%S")
+  PREVIOUS_INSTALL_MAINCHAIN="yes"
   mkdir -p /data/elastos/backup/${NOW}
   cp /data/elastos/ela/keystore.dat mainchain_keystore.dat; cp /data/elastos/ela/keystore.dat /data/elastos/backup/${NOW}/mainchain_keystore.dat
   cp /data/elastos/ela/config.json mainchain_config.json; cp /data/elastos/ela/config.json /data/elastos/backup/${NOW}/mainchain_config.json
   cp /data/elastos/did/config.json did_config.json; cp /data/elastos/did/config.json /data/elastos/backup/${NOW}/did_config.json
-  cp /data/elastos/eid/keystore.dat eid_keystore.dat; cp /data/elastos/eid/keystore.dat /data/elastos/backup/${NOW}/eid_keystore.dat
-  cp /data/elastos/eid/data/keystore/miner-keystore.dat eid_miner_keystore.dat; cp /data/elastos/eid/data/keystore/miner-keystore.dat /data/elastos/backup/${NOW}/miner-keystore.dat
-  cp /etc/elastos-eid/params.env eid_params.env; cp /etc/elastos-eid/params.env /data/elastos/backup/${NOW}/eid_params.env
-  cp /data/elastos/eth/keystore.dat eth_keystore.dat; cp /data/elastos/eth/keystore.dat /data/elastos/backup/${NOW}/eth_keystore.dat
-  cp /data/elastos/eth/data/keystore/miner-keystore.dat eth_miner_keystore.dat; cp /data/elastos/eth/data/keystore/miner-keystore.dat /data/elastos/backup/${NOW}/miner-keystore.dat
-  cp /etc/elastos-eth/params.env eth_params.env; cp /etc/elastos-eth/params.env /data/elastos/backup/${NOW}/eth_params.env
   cp /data/elastos/arbiter/config.json arbiter_config.json; cp /data/elastos/arbiter/config.json /data/elastos/backup/${NOW}/arbiter_config.json
   if [ ! -f /data/elastos/arbiter/keystore.dat ]
   then 
@@ -74,6 +67,22 @@ then
   cp /etc/elastos-metrics/params.env metrics_params.env; cp /etc/elastos-metrics/params.env /data/elastos/backup/${NOW}/metrics_params.env
   cp /data/elastos/metrics/conf/prometheus.yml prometheus.yml; cp /data/elastos/metrics/conf/prometheus.yml /data/elastos/backup/${NOW}/prometheus.yml
   cp /data/elastos/metrics/conf/alertmanager.yml alertmanager.yml; cp /data/elastos/metrics/conf/alertmanager.yml /data/elastos/backup/${NOW}/alertmanager.yml
+fi 
+if [ -f /data/elastos/eid/keystore.dat ]
+then
+  PREVIOUS_INSTALL_EID="yes"
+  mkdir -p /data/elastos/backup/${NOW}
+  cp /data/elastos/eid/keystore.dat eid_keystore.dat; cp /data/elastos/eid/keystore.dat /data/elastos/backup/${NOW}/eid_keystore.dat
+  cp /data/elastos/eid/data/keystore/miner-keystore.dat eid_miner_keystore.dat; cp /data/elastos/eid/data/keystore/miner-keystore.dat /data/elastos/backup/${NOW}/miner-keystore.dat
+  cp /etc/elastos-eid/params.env eid_params.env; cp /etc/elastos-eid/params.env /data/elastos/backup/${NOW}/eid_params.env
+fi 
+if [ -f /data/elastos/eth/keystore.dat ]
+then
+  PREVIOUS_INSTALL_ETH="yes"
+  mkdir -p /data/elastos/backup/${NOW}
+  cp /data/elastos/eth/keystore.dat eth_keystore.dat; cp /data/elastos/eth/keystore.dat /data/elastos/backup/${NOW}/eth_keystore.dat
+  cp /data/elastos/eth/data/keystore/miner-keystore.dat eth_miner_keystore.dat; cp /data/elastos/eth/data/keystore/miner-keystore.dat /data/elastos/backup/${NOW}/miner-keystore.dat
+  cp /etc/elastos-eth/params.env eth_params.env; cp /etc/elastos-eth/params.env /data/elastos/backup/${NOW}/eth_params.env
 fi
 
 # Download all the noderators packages required for setting up Elastos Supernode
@@ -98,20 +107,12 @@ done
 
 # If this is the first time installing packages, we wanna make sure to copy required info from config files 
 # from the packages that were just installed
-if [[ "${PREVIOUS_INSTALL}" != "yes" ]]
+if [[ "${PREVIOUS_INSTALL_MAINCHAIN}" != "yes" ]]
 then
-  # Let's backup these files just in case the user does not want to change any settings with the new release
-  NOW=$(date +"%Y-%m-%dT%H:%M:%S")
   mkdir -p /data/elastos/backup/${NOW}
   cp /data/elastos/ela/keystore.dat mainchain_keystore.dat; cp /data/elastos/ela/keystore.dat /data/elastos/backup/${NOW}/mainchain_keystore.dat
   cp /data/elastos/ela/config.json mainchain_config.json; cp /data/elastos/ela/config.json /data/elastos/backup/${NOW}/mainchain_config.json
   cp /data/elastos/did/config.json did_config.json; cp /data/elastos/did/config.json /data/elastos/backup/${NOW}/did_config.json
-  cp /data/elastos/eid/keystore.dat eid_keystore.dat; cp /data/elastos/eid/keystore.dat /data/elastos/backup/${NOW}/eid_keystore.dat
-  cp /data/elastos/eid/data/keystore/miner-keystore.dat eid_miner_keystore.dat; cp /data/elastos/eid/data/keystore/miner-keystore.dat /data/elastos/backup/${NOW}/miner-keystore.dat
-  cp /etc/elastos-eid/params.env eid_params.env; cp /etc/elastos-eid/params.env /data/elastos/backup/${NOW}/eid_params.env
-  cp /data/elastos/eth/keystore.dat eth_keystore.dat; cp /data/elastos/eth/keystore.dat /data/elastos/backup/${NOW}/eth_keystore.dat
-  cp /data/elastos/eth/data/keystore/miner-keystore.dat eth_miner_keystore.dat; cp /data/elastos/eth/data/keystore/miner-keystore.dat /data/elastos/backup/${NOW}/miner-keystore.dat
-  cp /etc/elastos-eth/params.env eth_params.env; cp /etc/elastos-eth/params.env /data/elastos/backup/${NOW}/eth_params.env
   cp /data/elastos/arbiter/config.json arbiter_config.json; cp /data/elastos/arbiter/config.json /data/elastos/backup/${NOW}/arbiter_config.json
   if [ ! -f /data/elastos/arbiter/keystore.dat ]
   then 
@@ -121,6 +122,20 @@ then
   cp /etc/elastos-metrics/params.env metrics_params.env; cp /etc/elastos-metrics/params.env /data/elastos/backup/${NOW}/metrics_params.env
   cp /data/elastos/metrics/conf/prometheus.yml prometheus.yml; cp /data/elastos/metrics/conf/prometheus.yml /data/elastos/backup/${NOW}/prometheus.yml
   cp /data/elastos/metrics/conf/alertmanager.yml alertmanager.yml; cp /data/elastos/metrics/conf/alertmanager.yml /data/elastos/backup/${NOW}/alertmanager.yml
+fi 
+if [[ "${PREVIOUS_INSTALL_EID}" != "yes" ]]
+then
+  mkdir -p /data/elastos/backup/${NOW}
+  cp /data/elastos/eid/keystore.dat eid_keystore.dat; cp /data/elastos/eid/keystore.dat /data/elastos/backup/${NOW}/eid_keystore.dat
+  cp /data/elastos/eid/data/keystore/miner-keystore.dat eid_miner_keystore.dat; cp /data/elastos/eid/data/keystore/miner-keystore.dat /data/elastos/backup/${NOW}/miner-keystore.dat
+  cp /etc/elastos-eid/params.env eid_params.env; cp /etc/elastos-eid/params.env /data/elastos/backup/${NOW}/eid_params.env
+fi 
+if [[ "${PREVIOUS_INSTALL_ETH}" != "yes" ]]
+then
+  mkdir -p /data/elastos/backup/${NOW}
+  cp /data/elastos/eth/keystore.dat eth_keystore.dat; cp /data/elastos/eth/keystore.dat /data/elastos/backup/${NOW}/eth_keystore.dat
+  cp /data/elastos/eth/data/keystore/miner-keystore.dat eth_miner_keystore.dat; cp /data/elastos/eth/data/keystore/miner-keystore.dat /data/elastos/backup/${NOW}/miner-keystore.dat
+  cp /etc/elastos-eth/params.env eth_params.env; cp /etc/elastos-eth/params.env /data/elastos/backup/${NOW}/eth_params.env
 fi
 
 # Create a new wallet for ELA mainchain node or do nothing depending on what the user wants to do
