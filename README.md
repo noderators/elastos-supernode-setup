@@ -8,6 +8,16 @@
 sudo ./setup.sh
 ```
 
+## Open up the required ports on your firewall configuration
+
+```
+ELA Mainchain - [TCP:20338,20339]
+Elastos Smart Contract(ESC) Sidechain - [TCP:20639,20638, UDP:20638]
+Elastos ID(EID) Sidechain - [TCP:20649,20648, UDP:20648]
+Elastos Arbiter - [TCP:20538]
+Elastos Carrier - [TCP:33445, UDP:3478,33445]
+```
+
 ## Change additional configs(OPTIONAL)
 
 - If you want to enable REST API Port on your ELA mainchain node, update /data/elastos/ela/config.json and do the following:
@@ -28,7 +38,7 @@ sudo ./setup.sh
 
 ## Verify whether the supernode has started running
 
-- Check current height for ELA mainchain node
+- Check current height for Elastos mainchain node
 
   ```
   port=$(cat /data/elastos/ela/config.json | jq -r ".Configuration.HttpJsonPort")
@@ -38,17 +48,15 @@ sudo ./setup.sh
   echo ${height}
   ```
 
-- Check current height for DID sidechain node
+- Check current height for Elastos ID(EID) sidechain node
 
   ```
-  port=$(cat /data/elastos/did/config.json | jq -r ".RPCPort")
-  usr=$(cat /data/elastos/did/config.json | jq -r ".RPCUser")
-  pswd=$(cat /data/elastos/did/config.json | jq -r ".RPCPass")
-  height=$(curl -X POST --user ${usr}:${pswd} http://localhost:${port} -H 'Content-Type: application/json' -d '{"method":"getnodestate"}' | jq ".result.height")
+  port=$(cat /etc/elastos-eid/params.env | grep RPCPORT | sed 's#.*RPCPORT=##g' | sed 's#"##g')
+  height=$(curl -X POST http://localhost:${port} -H 'Content-Type: application/json' -d '{"method":"eth_blockNumber", "id":1}' | jq -r ".result")
   echo ${height}
   ```
 
-- Check current height for Smart Contract sidechain(ETH) node
+- Check current height for Elastos Smart Contract(ESC) sidechain node
   ```
   port=$(cat /etc/elastos-eth/params.env | grep RPCPORT | sed 's#.*RPCPORT=##g' | sed 's#"##g')
   height=$(curl -X POST http://localhost:${port} -H 'Content-Type: application/json' -d '{"method":"eth_blockNumber", "id":1}' | jq -r ".result")
@@ -77,15 +85,13 @@ sudo ./setup.sh
   ```bash
   cd /data/elastos/ela;
   sudo su;
-  # Replace 'todo_keystore_password' with your own password for your keystore.dat file. You can find this at /etc/elastos-ela/params.env
-  KEYSTORE_PASSWORD='todo_keystore_password';
-  # Replace 'todo_rpc_user' with your own RPC username for your ELA mainchain node. You can find this at /data/elastos/ela/config.json
-  RPCUSERNAME='todo_rpc_user';
-  # Replace 'todo_rpc_pass' with your own RPC password for your ELA mainchain node. You can find this at /data/elastos/ela/config.json
-  RPCPASSWORD='todo_rpc_pass';
-  NODEKEY=$(elastos-ela-cli wallet a -p ${KEYSTORE_PASSWORD} | tail -2 | head -1 | cut -d' ' -f2);
-  elastos-ela-cli wallet buildtx activate --nodepublickey ${NODEKEY} -p ${KEYSTORE_PASSWORD};
-  elastos-ela-cli wallet sendtx -f ready_to_send.txn --rpcuser ${RPCUSERNAME} --rpcpassword ${RPCPASSWORD};
+  keystore_pswd=$(cat /etc/elastos-ela/params.env | grep KEYSTORE_PASSWORD | sed 's#.*KEYSTORE_PASSWORD=##g' | sed 's#"##g')
+  rpc_port=$(cat /data/elastos/ela/config.json | jq -r ".Configuration.HttpJsonPort")
+  rpc_user=$(cat /data/elastos/ela/config.json | jq -r ".Configuration.RpcConfiguration.User")
+  rpc_pswd=$(cat /data/elastos/ela/config.json | jq -r ".Configuration.RpcConfiguration.Pass")
+  node_key=$(elastos-ela-cli wallet a -p ${keystore_pswd} | tail -2 | head -1 | cut -d' ' -f2);
+  elastos-ela-cli wallet buildtx activate --nodepublickey ${node_key} -p ${keystore_pswd};
+  elastos-ela-cli wallet sendtx -f ready_to_send.txn --rpcuser ${rpc_user} --rpcpassword ${rpc_pswd} --rpcport ${rpc_port};
   rm -f ready_to_send.txn
   ```
 
@@ -124,7 +130,9 @@ sudo ./setup.sh
 - Any time you restart an instance, you're stopping the node for main chain, did sidechain, smart contract sidehchain, etc and then starting them again. You should also make sure to not upgrade elastos-ela without first making sure that your supernode is not currently in queue to submit a block proposal. You can check when your supernode will be proposing a block next by going to [https://www.noderators.org/arbitratorsonduty/](https://www.noderators.org/arbitratorsonduty/)
 - You can also check for this using your command line by doing the following
   ```bash
-  # Replace 'todo_rpc_user' and 'todo_rpc_password' with your own RPC username and password. You can find this at /data/elastos/ela/config.json
-  curl --user todo_rpc_user:todo_rpc_password -H 'Content-Type: application/json' -H 'Accept:application/json' --data '{"method":"getarbitersinfo"}' http://localhost:20336
+  port=$(cat /data/elastos/ela/config.json | jq -r ".Configuration.HttpJsonPort")
+  usr=$(cat /data/elastos/ela/config.json | jq -r ".Configuration.RpcConfiguration.User")
+  pswd=$(cat /data/elastos/ela/config.json | jq -r ".Configuration.RpcConfiguration.Pass")
+  curl --user ${usr}:${pswd} -H 'Content-Type: application/json' -H 'Accept:application/json' --data '{"method":"getarbitersinfo"}' http://localhost:${port}
   ```
   Should return the current onduty supernode(arbiter) and the next list of supernodes in queue to submit block proposals every block(~2 minutes)
