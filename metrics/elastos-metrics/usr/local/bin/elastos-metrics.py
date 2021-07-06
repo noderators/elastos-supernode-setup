@@ -35,7 +35,13 @@ def main():
     except:
         pass
 
-    # Smart Contract Sidechain(ETH) Node State 
+    # Elastos ID(EI) Sidechain Node State 
+    try:
+        handle_eid_sidechain(session)
+    except:
+        pass
+
+    # Elastos Smart Contract(ESC) Sidechain Node State 
     try:
         handle_eth_sidechain(session)
     except:
@@ -106,25 +112,34 @@ def handle_did_sidechain(session):
     with open("/data/elastos/metrics/prometheus/node-exporter/elastos-metrics.prom", "a") as out:
         out.write(f'elastos_metrics_nodestate{{chain="did",node="did-sidechain",port="{int(rpcport)}",rpcport="{int(rpcport)}",nodeversion="{node_version}",services="{services}"}} {height}\n')
 
+def handle_eid_sidechain(session):
+    rpcport, _, _ = getConfigs("/etc/elastos-eid/params.env", chain="eid")
+    node_state = getNodeState(session, rpcport, ethchain=True)
+    height = node_state["height"]
+    node_version = "0.1.0"
+    services = "Ethereum Virtual Machine"
+    with open("/data/elastos/metrics/prometheus/node-exporter/elastos-metrics.prom", "a") as out:
+        out.write(f'elastos_metrics_nodestate{{chain="eid",node="eid-sidechain",port="{int(rpcport)}",rpcport="{int(rpcport)}",nodeversion="{node_version}",services="{services}"}} {height}\n')
+
 def handle_eth_sidechain(session):
     rpcport, _, _ = getConfigs("/etc/elastos-eth/params.env", chain="eth")
     node_state = getNodeState(session, rpcport, ethchain=True)
     height = node_state["height"]
-    node_version = "0.1.2"
+    node_version = "0.1.3.2"
     services = "Ethereum Virtual Machine"
     with open("/data/elastos/metrics/prometheus/node-exporter/elastos-metrics.prom", "a") as out:
         out.write(f'elastos_metrics_nodestate{{chain="eth",node="eth-sidechain",port="{int(rpcport)}",rpcport="{int(rpcport)}",nodeversion="{node_version}",services="{services}"}} {height}\n')
 
 def handle_arbiter(session):
     rpcport = "20536"
-    node_version = "0.2.1"
+    node_version = "0.2.3"
     services = "Elastos Carrier Bootstrap Node"
     with open("/data/elastos/metrics/prometheus/node-exporter/elastos-metrics.prom", "a") as out:
         out.write(f'elastos_metrics_nodestate{{chain="crosschain",node="arbiter",port="{int(rpcport)}",rpcport="{int(rpcport)}",nodeversion="{node_version}",services="{services}"}} 1\n')
 
 def handle_carrier_bootstrap(session):
     port = "33445"
-    node_version = "5.2.3"
+    node_version = "6.0.1"
     services = "Elastos Carrier Bootstrap Node"
     with open("/data/elastos/metrics/prometheus/node-exporter/elastos-metrics.prom", "a") as out:
         out.write(f'elastos_metrics_nodestate{{chain="carrier",node="carrier",port="{int(port)}",rpcport="{int(port)}",nodeversion="{node_version}",services="{services}"}} 1\n')
