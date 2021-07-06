@@ -298,6 +298,8 @@ else
 fi
 if [[ ${port} = null ]] || [[ -z ${port} ]]; then port="20646"; fi
 sed -i "s#RPCPORT=.*#RPCPORT=\"${port}\"#g" /etc/elastos-eid/params.env
+unlock_address=$(cat /data/elastos/eid/data/keystore/miner-keystore.dat | jq -r ".address")
+sed -i "s#UNLOCK_ADDRESS=.*#UNLOCK_ADDRESS=\"0x${unlock_address}\"#g" /etc/elastos-eid/params.env
 ipaddress=$(curl ifconfig.me)
 sed -i "s#IPADDRESS=.*#IPADDRESS=\"${ipaddress}\"#g" /etc/elastos-eid/params.env
 cd /data/elastos/eid/oracle
@@ -334,6 +336,8 @@ else
 fi
 if [[ ${port} = null ]] || [[ -z ${port} ]]; then port="20636"; fi
 sed -i "s#RPCPORT=.*#RPCPORT=\"${port}\"#g" /etc/elastos-eth/params.env
+unlock_address=$(cat /data/elastos/eth/data/keystore/miner-keystore.dat | jq -r ".address")
+sed -i "s#UNLOCK_ADDRESS=.*#UNLOCK_ADDRESS=\"0x${unlock_address}\"#g" /etc/elastos-eth/params.env
 ipaddress=$(curl ifconfig.me)
 sed -i "s#IPADDRESS=.*#IPADDRESS=\"${ipaddress}\"#g" /etc/elastos-eth/params.env
 cd /data/elastos/eth/oracle
