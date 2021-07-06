@@ -72,16 +72,24 @@ if [ -f /data/elastos/eid/keystore.dat ]
 then
   PREVIOUS_INSTALL_EID="yes"
   mkdir -p /data/elastos/backup/${NOW}
-  cp /data/elastos/eid/keystore.dat eid_keystore.dat; cp /data/elastos/eid/keystore.dat /data/elastos/backup/${NOW}/eid_keystore.dat
+  cp /data/elastos/ela/keystore.dat eid_keystore.dat; cp /data/elastos/ela/keystore.dat /data/elastos/backup/${NOW}/eid_keystore.dat
+  keystore_pswd_file=$(cat /etc/elastos-eid/params.env | grep KEYSTORE_PASSWORD_FILE | sed 's#.*KEYSTORE_PASSWORD_FILE=##g' | sed 's#"##g')
+  echo $(cat ${keystore_pswd_file}) > eid_keystore_pswd.txt
   cp /data/elastos/eid/data/keystore/miner-keystore.dat eid_miner_keystore.dat; cp /data/elastos/eid/data/keystore/miner-keystore.dat /data/elastos/backup/${NOW}/miner-keystore.dat
+  miner_pswd_file=$(cat /etc/elastos-eid/params.env | grep MINER_PASSWORD_FILE | sed 's#.*MINER_PASSWORD_FILE=##g' | sed 's#"##g')
+  echo $(cat ${miner_pswd_file}) > eid_miner_pswd.txt
   cp /etc/elastos-eid/params.env eid_params.env; cp /etc/elastos-eid/params.env /data/elastos/backup/${NOW}/eid_params.env
 fi 
 if [ -f /data/elastos/eth/keystore.dat ]
 then
   PREVIOUS_INSTALL_ETH="yes"
   mkdir -p /data/elastos/backup/${NOW}
-  cp /data/elastos/eth/keystore.dat eth_keystore.dat; cp /data/elastos/eth/keystore.dat /data/elastos/backup/${NOW}/eth_keystore.dat
+  cp /data/elastos/ela/keystore.dat eth_keystore.dat; cp /data/elastos/ela/keystore.dat /data/elastos/backup/${NOW}/eth_keystore.dat
+  keystore_pswd_file=$(cat /etc/elastos-eth/params.env | grep KEYSTORE_PASSWORD_FILE | sed 's#.*KEYSTORE_PASSWORD_FILE=##g' | sed 's#"##g')
+  echo $(cat ${keystore_pswd_file}) > eth_keystore_pswd.txt
   cp /data/elastos/eth/data/keystore/miner-keystore.dat eth_miner_keystore.dat; cp /data/elastos/eth/data/keystore/miner-keystore.dat /data/elastos/backup/${NOW}/miner-keystore.dat
+  miner_pswd_file=$(cat /etc/elastos-eth/params.env | grep MINER_PASSWORD_FILE | sed 's#.*MINER_PASSWORD_FILE=##g' | sed 's#"##g')
+  echo $(cat ${miner_pswd_file}) > eth_miner_pswd.txt
   cp /etc/elastos-eth/params.env eth_params.env; cp /etc/elastos-eth/params.env /data/elastos/backup/${NOW}/eth_params.env
 fi
 
@@ -126,15 +134,23 @@ fi
 if [[ "${PREVIOUS_INSTALL_EID}" != "yes" ]]
 then
   mkdir -p /data/elastos/backup/${NOW}
-  cp /data/elastos/eid/keystore.dat eid_keystore.dat; cp /data/elastos/eid/keystore.dat /data/elastos/backup/${NOW}/eid_keystore.dat
+  cp /data/elastos/ela/keystore.dat eid_keystore.dat; cp /data/elastos/ela/keystore.dat /data/elastos/backup/${NOW}/eid_keystore.dat
+  keystore_pswd_file=$(cat /etc/elastos-eid/params.env | grep KEYSTORE_PASSWORD_FILE | sed 's#.*KEYSTORE_PASSWORD_FILE=##g' | sed 's#"##g')
+  echo $(cat ${keystore_pswd_file}) > eid_keystore_pswd.txt
   cp /data/elastos/eid/data/keystore/miner-keystore.dat eid_miner_keystore.dat; cp /data/elastos/eid/data/keystore/miner-keystore.dat /data/elastos/backup/${NOW}/miner-keystore.dat
+  miner_pswd_file=$(cat /etc/elastos-eid/params.env | grep MINER_PASSWORD_FILE | sed 's#.*MINER_PASSWORD_FILE=##g' | sed 's#"##g')
+  echo $(cat ${miner_pswd_file}) > eid_miner_pswd.txt
   cp /etc/elastos-eid/params.env eid_params.env; cp /etc/elastos-eid/params.env /data/elastos/backup/${NOW}/eid_params.env
 fi 
 if [[ "${PREVIOUS_INSTALL_ETH}" != "yes" ]]
 then
   mkdir -p /data/elastos/backup/${NOW}
-  cp /data/elastos/eth/keystore.dat eth_keystore.dat; cp /data/elastos/eth/keystore.dat /data/elastos/backup/${NOW}/eth_keystore.dat
+  cp /data/elastos/ela/keystore.dat eth_keystore.dat; cp /data/elastos/ela/keystore.dat /data/elastos/backup/${NOW}/eth_keystore.dat
+  keystore_pswd_file=$(cat /etc/elastos-eth/params.env | grep KEYSTORE_PASSWORD_FILE | sed 's#.*KEYSTORE_PASSWORD_FILE=##g' | sed 's#"##g')
+  echo $(cat ${keystore_pswd_file}) > eth_keystore_pswd.txt
   cp /data/elastos/eth/data/keystore/miner-keystore.dat eth_miner_keystore.dat; cp /data/elastos/eth/data/keystore/miner-keystore.dat /data/elastos/backup/${NOW}/miner-keystore.dat
+  miner_pswd_file=$(cat /etc/elastos-eth/params.env | grep MINER_PASSWORD_FILE | sed 's#.*MINER_PASSWORD_FILE=##g' | sed 's#"##g')
+  echo $(cat ${miner_pswd_file}) > eth_miner_pswd.txt
   cp /etc/elastos-eth/params.env eth_params.env; cp /etc/elastos-eth/params.env /data/elastos/backup/${NOW}/eth_params.env
 fi
 
@@ -150,15 +166,20 @@ then
   /usr/local/bin/elastos-ela-cli wallet create -p ${pswd}
   mv keystore.dat /data/elastos/ela/keystore.dat
   chown elauser:elauser /data/elastos/ela/keystore.dat 
+  cp /data/elastos/ela/keystore.dat /data/elastos/eid/keystore.dat
   cp /data/elastos/ela/keystore.dat /data/elastos/eth/keystore.dat
   cp /data/elastos/ela/keystore.dat /data/elastos/arbiter/keystore.dat
   sed -i "s#KEYSTORE_PASSWORD=.*#KEYSTORE_PASSWORD=\"${pswd}\"#g" /etc/elastos-ela/params.env
+  keyword_password_file=$(cat /etc/elastos-eid/params.env | grep KEYSTORE_PASSWORD_FILE | sed 's#.*KEYSTORE_PASSWORD_FILE=##g' | sed 's#"##g')
+  echo ${pswd} > ${keyword_password_file}
   keyword_password_file=$(cat /etc/elastos-eth/params.env | grep KEYSTORE_PASSWORD_FILE | sed 's#.*KEYSTORE_PASSWORD_FILE=##g' | sed 's#"##g')
   echo ${pswd} > ${keyword_password_file}
 else 
   cp mainchain_keystore.dat /data/elastos/ela/keystore.dat
   cp eid_keystore.dat /data/elastos/eid/keystore.dat
+  cp eid_keystore_pswd.txt /etc/elastos-eid/keystore.txt
   cp eth_keystore.dat /data/elastos/eth/keystore.dat
+  cp eth_keystore_pswd.txt /etc/elastos-eth/keystore.txt
   cp arbiter_keystore.dat /data/elastos/arbiter/keystore.dat
 fi
 chmod 644 /data/elastos/ela/keystore.dat
@@ -287,6 +308,7 @@ then
   chown elauser:elauser /data/elastos/eid/data/keystore/miner-keystore.dat 
 else 
   cp eid_miner_keystore.dat /data/elastos/eid/data/keystore/miner-keystore.dat
+  cp eid_miner_pswd.txt /etc/elastos-eid/miner.txt
 fi
 chmod 644 /data/elastos/eid/data/keystore/miner-keystore.dat
 read -p "Would you like to change the current info for RPC configuration and/or miner configuration for this node? [y/N] " answer
@@ -324,6 +346,7 @@ then
   chown elauser:elauser /data/elastos/eth/data/keystore/miner-keystore.dat 
 else 
   cp eth_miner_keystore.dat /data/elastos/eth/data/keystore/miner-keystore.dat
+  cp eth_miner_pswd.txt /etc/elastos-eth/miner.txt
 fi
 chmod 644 /data/elastos/eth/data/keystore/miner-keystore.dat
 read -p "Would you like to change the current info for RPC configuration and/or miner configuration for this node? [y/N] " answer

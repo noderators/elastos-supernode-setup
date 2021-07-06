@@ -146,7 +146,7 @@ def handle_carrier_bootstrap(session):
 
 def handle_metrics(session):
     port, user, password = getConfigs("/etc/elastos-metrics/params.env", chain="metrics")
-    node_version = "1.5.0"
+    node_version = "1.6.0"
     services = "Elastos Metrics Node"
     with open("/data/elastos/metrics/prometheus/node-exporter/elastos-metrics.prom", "a") as out:
         out.write(f'elastos_metrics_nodestate{{chain="metrics",node="metrics",port="{int(port)}",rpcport="{int(port)}",nodeversion="{node_version}",services="{services}"}} 1\n')
