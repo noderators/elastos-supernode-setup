@@ -20,44 +20,51 @@ def main():
     # Main chain Node State
     try:
         handle_mainchain(session)
-    except:
+    except Exception as e:
+        print(str(e))
         pass
 
     # DPoS Node Info
     try:
         handle_dpos(session)
-    except:
+    except Exception as e:
+        print(str(e))
         pass
 
     # DID Sidechain Node State
     try:
         handle_did_sidechain(session)
-    except:
+    except Exception as e:
+        print(str(e))
         pass
 
     # Elastos ID(EI) Sidechain Node State 
     try:
         handle_eid_sidechain(session)
-    except:
+    except Exception as e:
+        print(str(e))
         pass
 
     # Elastos Smart Contract(ESC) Sidechain Node State 
     try:
         handle_eth_sidechain(session)
-    except:
-        pass 
+    except Exception as e:
+        print(str(e))
+        pass
 
     # Arbiter Node State 
     try:
         handle_arbiter(session)
-    except:
-        pass 
+    except Exception as e:
+        print(str(e))
+        pass
 
     # Carrier Boostrap Node State 
     try:
         handle_carrier_bootstrap(session)
-    except:
-        pass 
+    except Exception as e:
+        print(str(e))
+        pass
 
     # Metrics Node State 
     try:
@@ -201,7 +208,7 @@ def getConfigs(config_file, chain="main"):
             config_data = json.load(f)["Configuration"]
         elif chain == "did":
             config_data = json.load(f)
-        elif chain == "eth" or chain == "metrics":
+        elif chain == "eid" or chain == "eth" or chain == "metrics":
             config_data = {}
             for line in f:
                 key, val = line.partition("=")[::2]
@@ -221,6 +228,12 @@ def getConfigs(config_file, chain="main"):
             rpcport = 20606
         rpcuser = config_data["RPCUser"]
         rpcpassword = config_data["RPCPass"]
+    elif chain == "eid":
+        try:
+            rpcport = config_data["RPCPort"].rstrip().strip('"')
+        except KeyError:
+            rpcport = 20646
+            rpcuser, rpcpassword = '', ''
     elif chain == "eth":
         try:
             rpcport = config_data["RPCPort"].rstrip().strip('"')
