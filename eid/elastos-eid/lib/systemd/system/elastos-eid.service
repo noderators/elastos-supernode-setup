@@ -16,7 +16,8 @@ ExecStart=/usr/local/bin/elastos-eid     \
             --password ${MINER_PASSWORD_FILE}                   \
             --pbft.keystore.password ${KEYSTORE_PASSWORD_FILE}  \
             --pbft.net.address ${IPADDRESS}                     \
-            --pbft.net.port 20739                               \
+            --pbft.net.port 20649                               \
+            --syncmode "full" \
             --allow-insecure-unlock
             
 User=elauser

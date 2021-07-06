@@ -12,11 +12,8 @@
       {
         "Rpc": {
           "IpAddress": "localhost",
-          "HttpJsonPort": 20732,
-          "User": "",
-          "Pass": ""
+          "HttpJsonPort": 20642
         },
-        "SyncStartHeight": 2515000,
         "ExchangeRate": 1.0,
         "GenesisBlock": "7d0702054ad68913eff9137dfa0b0b6ff701d55062359deacad14859561f5567",
         "PowChain": false
@@ -24,16 +21,14 @@
       {
         "Rpc": {
           "IpAddress": "localhost",
-          "HttpJsonPort": 20632,
-          "User": "",
-          "Pass": ""
+          "HttpJsonPort": 20632
         },
-        "SyncStartHeight": 2515000,
+        "SyncStartHeight": 6551000,
         "ExchangeRate": 1.0,
         "GenesisBlock": "6afc2eb01956dfe192dc4cd065efdf6c3c80448776ca367a7246d279e228ff0a",
         "PowChain": false
       },
-            {
+      {
         "Rpc": {
           "IpAddress": "localhost",
           "HttpJsonPort": 20606,

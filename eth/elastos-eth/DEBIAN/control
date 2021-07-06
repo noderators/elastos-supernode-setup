@@ -1,6 +1,6 @@
 Package: elastos-eth
 Source: noderators
-Version: 0.1.2-1
+Version: 0.1.3-2
 Architecture: amd64
 Maintainer: Kiran Pachhai <kiran.pachhai@gmail.com>
 Pre-Depends: adduser

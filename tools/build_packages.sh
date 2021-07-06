@@ -36,11 +36,11 @@ build_deb_package did elastos-did 0.3.1-1
 
 build_deb_package eid elastos-eid 0.1.0-1
 
-build_deb_package eth elastos-eth 0.1.2-1
+build_deb_package eth elastos-eth 0.1.3-2
 
-build_deb_package arbiter elastos-arbiter 0.2.1-2
+build_deb_package arbiter elastos-arbiter 0.2.3-1
 
-build_deb_package carrier elastos-carrier-bootstrap 5.2.3-3
+build_deb_package carrier elastos-carrier-bootstrap 6.0.1-1
 
 build_deb_package metrics elastos-metrics 1.5.0-1
 

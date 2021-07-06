@@ -1,7 +1,7 @@
 "use strict";
 
 const Web3 = require("web3");
-const web3 = new Web3("http://127.0.0.1:20636");
+const web3 = new Web3("http://127.0.0.1:20646");
 const ctrt = require("./ctrt");
 
 const contract = new web3.eth.Contract(ctrt.abi);
@@ -16,8 +16,8 @@ switch (process.env.env) {
         contract.options.address = "0x491bC043672B9286fA02FA7e0d6A3E5A0384A31A";
         break;
     case "mainnet":
-        console.log("0xC445f9487bF570fF508eA9Ac320b59730e81e503");
-        contract.options.address = "0xC445f9487bF570fF508eA9Ac320b59730e81e503";
+        console.log("0x6F60FdED6303e73A83ef99c53963407f415e80b9");
+        contract.options.address = "0x6F60FdED6303e73A83ef99c53963407f415e80b9";
         break;
     default:
         console.log("config address");
@@ -51,11 +51,16 @@ module.exports = {
         return;
     },
     retnum: function toNonExponential(num) {
-        let m = num.toExponential(8).match(/\d(?:\.(\d*))?e([+-]\d+)/);
-        if (m[2] < 0 ) {
-            m[2] = '0';
+        let value = num.toString()
+        let numList = value.split(".")
+        let returnValue = value
+        if (numList.length > 1) {
+            let precisionStr = numList[1]
+            if (precisionStr.length > 8) {
+                let b = precisionStr.substr(precisionStr.lastIndexOf(".") + 1,8)
+                returnValue = numList[0] + "." + b
+            }
         }
-        let jingdu = Math.max(0, (m[1] || '').length - m[2])
-        return num.toFixed(jingdu);
+        return returnValue
     }
 };
