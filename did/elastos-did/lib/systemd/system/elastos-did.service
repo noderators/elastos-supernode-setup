@@ -4,6 +4,8 @@ After=network-online.target
 
 [Service]
 Type=simple
+StandardOutput=null
+StandardError=null
 WorkingDirectory=/data/elastos/did
 ExecStart=/usr/local/bin/elastos-did
 

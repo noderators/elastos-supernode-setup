@@ -4,6 +4,8 @@ After=network-online.target
 
 [Service]
 Type=simple
+StandardOutput=null
+StandardError=null
 WorkingDirectory=/data/elastos/ela
 EnvironmentFile=/etc/elastos-ela/params.env
 ExecStart=/usr/local/bin/elastos-ela    \
