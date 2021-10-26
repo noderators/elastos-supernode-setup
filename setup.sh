@@ -96,7 +96,7 @@ fi
 echo ""
 echo "Downloading packages required for Elastos Supernode"
 DEPS=( "elastos-ela" "elastos-eid" "elastos-eth" "elastos-arbiter" "elastos-carrier-bootstrap" "elastos-metrics" )
-VERSIONS=( "0.8.2-1" "0.1.2-1" "0.1.3-2" "0.2.3-2" "6.0.1-1" "1.6.0-1" )
+VERSIONS=( "0.8.2-1" "0.1.2-1" "0.1.3-2" "0.2.3-2" "6.0.1-1" "1.6.1-1" )
 for i in "${!DEPS[@]}"
 do 
   echo "Downloading ${DEPS[$i]} Version: ${VERSIONS[$i]}"

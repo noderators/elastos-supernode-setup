@@ -1,12 +1,12 @@
 groups:
-- name: ElastosRules
-  rules:
-  # Height hasn't been growing for a while
-  - alert: HeightNotGrowing
-    expr: (idelta(elastos_metrics_nodestate{chain=~"(main|did|eth)"}[5m])) == 0
-    for: 1h
-    labels:
-      severity: critical
-    annotations:
-      summary: "Elastos Blockchain not growing (instance {{ $labels.instance }}, chain {{ $labels.chain }})"
-      description: "Height has not been growing for at least an hour\n  LABELS: {{ $labels }}"
+  - name: ElastosRules
+    rules:
+      # Height hasn't been growing for a while
+      - alert: HeightNotGrowing
+        expr: (idelta(elastos_metrics_nodestate{chain=~"(main)"}[5m])) == 0
+        for: 1h
+        labels:
+          severity: critical
+        annotations:
+          summary: "Elastos Blockchain not growing (instance {{ $labels.instance }}, chain {{ $labels.chain }})"
+          description: "Height has not been growing for at least an hour\n  LABELS: {{ $labels }}"
