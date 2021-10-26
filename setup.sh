@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-RELEASE="v1.25"
+RELEASE="v1.26"
 
 # If not running with sudo, exit 
 if [[ $(/usr/bin/id -u) -ne 0 ]]; then
@@ -44,8 +44,8 @@ do
     apt-get install ${dep} -y
   fi
 done
-# Remove token sidechain stuff as it's no longer needed to be run
-apt-get remove elastos-token -y; rm -rf /data/elastos/token 
+# Remove did and token sidechain stuff as it's no longer needed to be run
+apt-get remove elastos-did elastos-token -y; rm -rf /data/elastos/did /data/elastos/token 
 # Remove ioex node as it's no longer supported
 apt-get remove ioex-mainchain -y; rm -rf /data/ioex
 
@@ -57,7 +57,6 @@ then
   mkdir -p /data/elastos/backup/${NOW}
   cp /data/elastos/ela/keystore.dat mainchain_keystore.dat; cp /data/elastos/ela/keystore.dat /data/elastos/backup/${NOW}/mainchain_keystore.dat
   cp /data/elastos/ela/config.json mainchain_config.json; cp /data/elastos/ela/config.json /data/elastos/backup/${NOW}/mainchain_config.json
-  cp /data/elastos/did/config.json did_config.json; cp /data/elastos/did/config.json /data/elastos/backup/${NOW}/did_config.json
   cp /data/elastos/arbiter/config.json arbiter_config.json; cp /data/elastos/arbiter/config.json /data/elastos/backup/${NOW}/arbiter_config.json
   if [ ! -f /data/elastos/arbiter/keystore.dat ]
   then 
@@ -96,8 +95,8 @@ fi
 # Download all the noderators packages required for setting up Elastos Supernode
 echo ""
 echo "Downloading packages required for Elastos Supernode"
-DEPS=( "elastos-ela" "elastos-did" "elastos-eid" "elastos-eth" "elastos-arbiter" "elastos-carrier-bootstrap" "elastos-metrics" )
-VERSIONS=( "0.7.0-3" "0.3.1-2" "0.1.0-1" "0.1.3-2" "0.2.3-1" "6.0.1-1" "1.6.0-1" )
+DEPS=( "elastos-ela" "elastos-eid" "elastos-eth" "elastos-arbiter" "elastos-carrier-bootstrap" "elastos-metrics" )
+VERSIONS=( "0.8.2-1" "0.1.2-1" "0.1.3-2" "0.2.3-2" "6.0.1-1" "1.6.0-1" )
 for i in "${!DEPS[@]}"
 do 
   echo "Downloading ${DEPS[$i]} Version: ${VERSIONS[$i]}"
@@ -120,7 +119,6 @@ then
   mkdir -p /data/elastos/backup/${NOW}
   cp /data/elastos/ela/keystore.dat mainchain_keystore.dat; cp /data/elastos/ela/keystore.dat /data/elastos/backup/${NOW}/mainchain_keystore.dat
   cp /data/elastos/ela/config.json mainchain_config.json; cp /data/elastos/ela/config.json /data/elastos/backup/${NOW}/mainchain_config.json
-  cp /data/elastos/did/config.json did_config.json; cp /data/elastos/did/config.json /data/elastos/backup/${NOW}/did_config.json
   cp /data/elastos/arbiter/config.json arbiter_config.json; cp /data/elastos/arbiter/config.json /data/elastos/backup/${NOW}/arbiter_config.json
   if [ ! -f /data/elastos/arbiter/keystore.dat ]
   then 
@@ -197,40 +195,6 @@ else
 fi
 chmod 644 /data/elastos/ela/keystore.dat
 
-# Create a new secondary wallet for DID sidechain node on Arbiter node if it doesn't exist
-echo ""
-pswd=$(cat /etc/elastos-ela/params.env | grep KEYSTORE_PASSWORD | sed 's#.*KEYSTORE_PASSWORD=##g' | sed 's#"##g')
-# Check to make sure whether the keystore.dat of ELA mainchain node and Arbiter node match
-cp /data/elastos/arbiter/keystore.dat .
-NUM_WALLETS=$(elastos-ela-cli wallet a -p ${pswd} | grep - | wc -l)
-NUM_WALLETS=$(expr ${NUM_WALLETS} - 1)
-ELA_ADDRESS=$(cat /data/elastos/ela/keystore.dat | jq -r ".Account[0].Address")
-if [[ "${ELA_ADDRESS}" != "$(cat /data/elastos/arbiter/keystore.dat | jq -r ".Account[0].Address")" ]]
-then 
-  if [[ "${NUM_WALLETS}" -gt "2" ]] || [[ "${NUM_WALLETS}" -lt "2" ]]
-  then 
-    cp /data/elastos/ela/keystore.dat .
-    NUM_WALLETS=1
-  elif [[ "${NUM_WALLETS}" -eq "2" ]] 
-  then 
-    if [[ "${ELA_ADDRESS}" != "$(cat /data/elastos/arbiter/keystore.dat | jq -r ".Account[1].Address")" ]]
-    then 
-      cp /data/elastos/ela/keystore.dat .
-      NUM_WALLETS=1
-    fi
-  fi 
-fi 
-if [[ "${NUM_WALLETS}" -eq "1" ]]
-then
-  echo ""
-  echo "Creating a secondary account for Arbiter node that will be used for did block generation"
-  chown $USER:$USER keystore.dat
-  /usr/local/bin/elastos-ela-cli wallet add -p ${pswd}
-  cp keystore.dat /data/elastos/arbiter/keystore.dat
-  chown elauser:elauser /data/elastos/arbiter/keystore.dat 
-fi
-chmod 644 /data/elastos/arbiter/keystore.dat
-
 # Configure all the configs for RPC and miner info for ELA mainchain node
 echo ""
 echo "Modifying the config file parameters for ELA mainchain node"
@@ -263,45 +227,6 @@ cat <<< $(jq ".Configuration.PowConfiguration.MinerInfo = \"${minername}\"" /dat
 cat <<< $(jq ".Configuration.MainNode.Rpc.HttpJsonPort = ${port}" /data/elastos/arbiter/config.json) > /data/elastos/arbiter/config.json
 cat <<< $(jq ".Configuration.MainNode.Rpc.User = \"${usr}\"" /data/elastos/arbiter/config.json) > /data/elastos/arbiter/config.json
 cat <<< $(jq ".Configuration.MainNode.Rpc.Pass = \"${pswd}\"" /data/elastos/arbiter/config.json) > /data/elastos/arbiter/config.json
-
-# Configure all the configs for RPC and miner info for DID sidechain node
-echo ""
-echo "Modifying the config file parameters for DID sidechain node"
-read -p "Would you like to change the current info for RPC configuration and/or miner configuration for this node? [y/N] " answer
-if [[ "${answer}" == "y" ]] || [[ "${answer}" == "Y" ]] || [[ "${answer}" == "yes" ]]
-then
-  read -p "Enter the port you would like to set for RPC configuration: " port
-  read -p "Enter the username you would like to set for RPC configuration: " usr
-  read -p "Enter the password you would like to set for RPC configuration: " pswd
-  read -p "Enter the ELA address you would like to set for miner fees payout: " elaaddr
-  read -p "Enter the miner name you would like to assign to your node: " minername
-else 
-  port=$(cat did_config.json | jq -r ".RPCPort")
-  usr=$(cat did_config.json | jq -r ".RPCUser")
-  pswd=$(cat did_config.json | jq -r ".RPCPass")
-  elaaddr=$(cat did_config.json | jq -r ".PayToAddr")
-  minername=$(cat did_config.json | jq -r ".MinerInfo")
-fi
-if [[ ${port} = null ]] || [[ -z ${port} ]]; then port="20606"; fi
-if [[ ${usr} = null ]]; then usr=""; fi
-if [[ ${pswd} = null ]]; then pswd=""; fi
-if [[ ${elaaddr} = null ]] || [[ -z ${elaaddr} ]]; then elaaddr="EHohTEm9oVUY5EQxm8MDb6fBEoRpwTyjbb"; fi
-if [[ ${minername} = null ]] || [[ -z ${minername} ]]; then minername="Noderators - Watermelon"; fi
-cat <<< $(jq ".RPCPort = ${port}" /data/elastos/did/config.json) > /data/elastos/did/config.json
-cat <<< $(jq ".RPCUser = \"${usr}\"" /data/elastos/did/config.json) > /data/elastos/did/config.json
-cat <<< $(jq ".RPCPass = \"${pswd}\"" /data/elastos/did/config.json) > /data/elastos/did/config.json
-cat <<< $(jq ".PayToAddr = \"${elaaddr}\"" /data/elastos/did/config.json) > /data/elastos/did/config.json
-cat <<< $(jq ".MinerInfo = \"${minername}\"" /data/elastos/did/config.json) > /data/elastos/did/config.json
-cat <<< $(jq ".Configuration.SideNodeList[2].Rpc.HttpJsonPort = ${port}" /data/elastos/arbiter/config.json) > /data/elastos/arbiter/config.json
-cat <<< $(jq ".Configuration.SideNodeList[2].Rpc.User = \"${usr}\"" /data/elastos/arbiter/config.json) > /data/elastos/arbiter/config.json
-cat <<< $(jq ".Configuration.SideNodeList[2].Rpc.Pass = \"${pswd}\"" /data/elastos/arbiter/config.json) > /data/elastos/arbiter/config.json
-cat <<< $(jq ".Configuration.SideNodeList[2].PayToAddr = \"${elaaddr}\"" /data/elastos/arbiter/config.json) > /data/elastos/arbiter/config.json
-mining_address=$(cat /data/elastos/arbiter/keystore.dat | jq -r ".Account[0].Address")
-if [[ "$(cat /data/elastos/arbiter/keystore.dat | jq -r ".Account[0].Type")" != "sub-account" ]]
-then 
-  mining_address=$(cat /data/elastos/arbiter/keystore.dat | jq -r ".Account[1].Address")
-fi
-cat <<< $(jq ".Configuration.SideNodeList[2].MiningAddr = \"${mining_address}\"" /data/elastos/arbiter/config.json) > /data/elastos/arbiter/config.json
 
 # Configure all the configs for Elastos ID(EID) sidechain node such as creating miner wallet if it 
 # does not exist 
@@ -465,5 +390,40 @@ sed -i "s#to:.*#to: \"${smtp_to}\"#g" /data/elastos/metrics/conf/alertmanager.ym
 echo ""
 echo "Starting up all the services required for running the supernode"
 systemctl daemon-reload
-systemctl restart elastos-ela elastos-did elastos-eid elastos-eid-oracle elastos-eth elastos-eth-oracle elastos-carrier-bootstrap elastos-metrics prometheus prometheus-node-exporter prometheus-pushgateway prometheus-alertmanager
-systemctl restart elastos-arbiter
+systemctl restart elastos-ela elastos-metrics prometheus prometheus-node-exporter prometheus-pushgateway prometheus-alertmanager
+
+# Ask the user which nodes they would like to run
+echo ""
+echo "You MUST run a mainchain node to be part of the supernodes however, whether or not you run the sidechain nodes are up to you. Please answer the following questions to determine which nodes you would like to run."
+read -p "Would you like to run Elastos Identity Sidechain(EID) node? [y/N] " answer 
+if [[ "${answer}" == "y" ]] || [[ "${answer}" == "Y" ]] || [[ "${answer}" == "yes" ]]
+then
+  systemctl enable elastos-eid elastos-eid-oracle
+  systemctl restart elastos-eid elastos-eid-oracle
+else 
+  systemctl disable elastos-eid elastos-eid-oracle
+fi
+read -p "Would you like to run Elastos Smart Contract Sidechain(ESC) node? [y/N] " answer 
+if [[ "${answer}" == "y" ]] || [[ "${answer}" == "Y" ]] || [[ "${answer}" == "yes" ]]
+then
+  systemctl enable elastos-eth elastos-eth-oracle
+  systemctl restart elastos-eth elastos-eth-oracle
+else 
+  systemctl disable elastos-eth elastos-eth-oracle
+fi
+read -p "The Arbiter node handles cross chain transactions and currently is only required for CRC supernodes so it's up to you whether or not to run this. Would you like to run Elastos Arbiter node? [y/N] " answer 
+if [[ "${answer}" == "y" ]] || [[ "${answer}" == "Y" ]] || [[ "${answer}" == "yes" ]]
+then
+  systemctl enable elastos-arbiter
+  systemctl restart elastos-arbiter
+else 
+  systemctl disable elastos-arbiter
+fi
+read -p "The Carrier bootstrap node makes the Elastos Carrier network stronger by creating more endpoints for the peer to peer decentralized network and it's up to you whether or not to run this. Would you like to run Elastos Carrier Bootstrap node? [y/N] " answer 
+if [[ "${answer}" == "y" ]] || [[ "${answer}" == "Y" ]] || [[ "${answer}" == "yes" ]]
+then
+  systemctl enable elastos-carrier-bootstrap
+  systemctl restart elastos-carrier-bootstrap
+else 
+  systemctl disable elastos-carrier-bootstrap
+fi

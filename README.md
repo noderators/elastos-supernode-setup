@@ -25,15 +25,9 @@ Elastos Carrier - [TCP:33445, UDP:3478,33445]
   - Add `"HttpRestStart": true,` inside `"Configuration"` object
   - Add `"HttpRestPort": 20334,` where `"20334"` is the port of your choosing
 
-- If you want to enable REST API Port on your DID sidechain node, update /data/elastos/did/config.json and do the following:
-
-  - Add `"EnableREST": true,`
-  - Add `"RESTPort": 20604` where `"20604"` is the port of your choosing
-
 - Once you change any config, make sure to restart the appropriate service
   ```
   sudo systemctl restart elastos-ela
-  sudo systemctl restart elastos-did
   ```
 
 ## Verify whether the supernode has started running

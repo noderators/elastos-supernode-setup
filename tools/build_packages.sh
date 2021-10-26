@@ -30,15 +30,13 @@ function build_deb_package() {
     cd $CURR_DIR
 }
 
-build_deb_package ela elastos-ela 0.7.0-3
+build_deb_package ela elastos-ela 0.8.2-1
 
-build_deb_package did elastos-did 0.3.1-2
-
-build_deb_package eid elastos-eid 0.1.0-1
+build_deb_package eid elastos-eid 0.1.2-1
 
 build_deb_package eth elastos-eth 0.1.3-2
 
-build_deb_package arbiter elastos-arbiter 0.2.3-1
+build_deb_package arbiter elastos-arbiter 0.2.3-2
 
 build_deb_package carrier elastos-carrier-bootstrap 6.0.1-1
 
