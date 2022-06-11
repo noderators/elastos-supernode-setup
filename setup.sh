@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-RELEASE="v1.26"
+RELEASE="v1.27"
 
 # If not running with sudo, exit 
 if [[ $(/usr/bin/id -u) -ne 0 ]]; then
