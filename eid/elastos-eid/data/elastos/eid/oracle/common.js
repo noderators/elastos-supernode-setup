@@ -8,12 +8,12 @@ const contract = new web3.eth.Contract(ctrt.abi);
 console.log(JSON.stringify(process.env.env));
 switch (process.env.env) {
     case "rinkeby":
-        console.log("0x491bC043672B9286fA02FA7e0d6A3E5A0384A31A");
-        contract.options.address = "0x491bC043672B9286fA02FA7e0d6A3E5A0384A31A";
+        console.log("0x762a042b8B9f9f0d3179e992d965c11785219599");
+        contract.options.address = "0x762a042b8B9f9f0d3179e992d965c11785219599";
         break;
     case "testnet":
-        console.log("0x491bC043672B9286fA02FA7e0d6A3E5A0384A31A");
-        contract.options.address = "0x491bC043672B9286fA02FA7e0d6A3E5A0384A31A";
+        console.log("0x762a042b8B9f9f0d3179e992d965c11785219599");
+        contract.options.address = "0x762a042b8B9f9f0d3179e992d965c11785219599";
         break;
     case "mainnet":
         console.log("0x6F60FdED6303e73A83ef99c53963407f415e80b9");
