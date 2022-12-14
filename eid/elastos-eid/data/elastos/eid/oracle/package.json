@@ -4,7 +4,7 @@
   "description": "",
   "main": "crosschain_oracle.js",
   "dependencies": {
-    "express": "^4.16.0",
+    "express": "^4.17.3",
     "web3": "^1.2.1"
   },
   "devDependencies": {},
